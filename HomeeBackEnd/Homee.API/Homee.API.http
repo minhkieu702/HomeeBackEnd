@@ -1,0 +1,6 @@
+@Homee.API_HostAddress = http://localhost:5188
+
+GET {{Homee.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
