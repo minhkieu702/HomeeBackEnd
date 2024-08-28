@@ -15,6 +15,8 @@ CREATE TABLE Account (
     BirthDay DATE,
     CreatedAt DATETIME NOT NULL,
     UpdatedAt DATETIME NOT NULL,
+	GoogleUserId NVARCHAR(255) NULL,
+	IsGoogleAuthenticated BIT NOT NULL DEFAULT 0,
     IsBlock BIT NOT NULL
 );
 
