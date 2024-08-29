@@ -29,6 +29,8 @@ public partial class Account
 
     public bool IsBlock { get; set; }
 
+    public bool IsGoogleAuthenticated { get; set; }
+
     public virtual ICollection<Contract> Contracts { get; set; } = new List<Contract>();
 
     public virtual ICollection<FavoritePost> FavoritePosts { get; set; } = new List<FavoritePost>();

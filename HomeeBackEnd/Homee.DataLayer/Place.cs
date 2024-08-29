@@ -38,4 +38,6 @@ public partial class Place
     public virtual Account Owner { get; set; } = null!;
 
     public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
+
+    public virtual ICollection<Category> Categories { get; set; } = new List<Category>();
 }

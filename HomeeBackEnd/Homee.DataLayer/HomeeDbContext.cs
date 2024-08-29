@@ -18,6 +18,8 @@ public partial class HomeeDbContext : DbContext
 
     public virtual DbSet<Account> Accounts { get; set; }
 
+    public virtual DbSet<Category> Categories { get; set; }
+
     public virtual DbSet<Contract> Contracts { get; set; }
 
     public virtual DbSet<Conversation> Conversations { get; set; }
@@ -86,6 +88,32 @@ public partial class HomeeDbContext : DbContext
                     {
                         j.HasKey("AccountId", "ConversationId").HasName("PK__Conversa__5898A82105B840A9");
                         j.ToTable("ConversationParticipant");
+                    });
+        });
+
+        modelBuilder.Entity<Category>(entity =>
+        {
+            entity.HasKey(e => e.CategoryId).HasName("PK__Category__19093A0BA8CB9770");
+
+            entity.ToTable("Category");
+
+            entity.Property(e => e.CategoryName).HasMaxLength(250);
+
+            entity.HasMany(d => d.Places).WithMany(p => p.Categories)
+                .UsingEntity<Dictionary<string, object>>(
+                    "CategoryPlace",
+                    r => r.HasOne<Place>().WithMany()
+                        .HasForeignKey("PlaceId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_CategoryPlace_Place"),
+                    l => l.HasOne<Category>().WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_CategoryPlace_Category"),
+                    j =>
+                    {
+                        j.HasKey("CategoryId", "PlaceId").HasName("PK__Category__E45B18BDCF916A84");
+                        j.ToTable("CategoryPlace");
                     });
         });
 

@@ -1,7 +1,16 @@
 use master
 create database HomeeDB
 use HomeeDB
-
+CREATE TABLE [dbo].[Category](
+	[CategoryId] int IDENTITY(1,1) NOT NULL,
+	[CategoryName] nvarchar(250) NOT NULL
+	);
+	CREATE TABLE [dbo].[CategoryPlace](
+	[CategoryId] int NOT NULL,
+	[PlaceId] int NOT NULL,
+	    CONSTRAINT FK_CategoryPlace_Place FOREIGN KEY (PlaceId) REFERENCES Place(PlaceId),
+		    CONSTRAINT FK_CategoryPlace_Category FOREIGN KEY (CategoryId) REFERENCES Category(CategoryId)
+			);
 -- Create Account table
 CREATE TABLE Account (
     AccountId INT PRIMARY KEY IDENTITY(1,1),
