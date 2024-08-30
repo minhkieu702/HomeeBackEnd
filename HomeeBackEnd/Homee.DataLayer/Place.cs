@@ -29,7 +29,7 @@ public partial class Place
 
     public int OwnerId { get; set; }
 
-    public int Status { get; set; }
+    public bool? IsBlock { get; set; }
 
     public virtual ICollection<Contract> Contracts { get; set; } = new List<Contract>();
 
