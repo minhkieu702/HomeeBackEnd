@@ -1,6 +1,7 @@
 use master
 create database HomeeDB
 use HomeeDB
+
 CREATE TABLE [dbo].[Category](
 	[CategoryId] int IDENTITY(1,1) NOT NULL,
 	[CategoryName] nvarchar(250) NOT NULL
@@ -131,7 +132,7 @@ CREATE TABLE Place (
     NumberOfBedroom INT NOT NULL,
     Rent FLOAT NOT NULL,
     OwnerId INT NOT NULL,
-    Status INT NOT NULL,
+    IsBlock BIT NOT NULL,
     CONSTRAINT FK_Place_Owner FOREIGN KEY (OwnerId) REFERENCES Account(AccountId)
 );
 
