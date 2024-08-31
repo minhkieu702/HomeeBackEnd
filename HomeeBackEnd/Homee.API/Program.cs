@@ -1,3 +1,5 @@
+using Homee.API.AppStart;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,6 +9,17 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddAutoMapper(typeof(MapperConfig));
+builder.Services.ConfigDI();
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAnyOrigins", policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -15,6 +28,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors();
+
+app.UseSession();
 
 app.UseHttpsRedirection();
 
