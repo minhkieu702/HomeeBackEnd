@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -57,23 +59,22 @@ namespace Homee.BusinessLayer.Helpers
             }
         }
 
-        //public object GetValueFromSession(string key, HttpContext context)
-        //{
-        //    context.Session.TryGetValue(key, out byte[] o);
-        //    return JsonConvert.DeserializeObject(Encoding.UTF8.GetString(o));
-        //}
+        public object GetValueFromSession(string key, HttpContext context)
+        {
+            context.Session.TryGetValue(key, out byte[] o);
+            return JsonConvert.DeserializeObject(Encoding.UTF8.GetString(o));
+        }
 
-        //public void SetValueToSession(string key, object value, HttpContext context)
-        //{
-        //    context.Session.Set(key, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value)));
-        //}
+        public void SetValueToSession(string key, object value, HttpContext context)
+        {
+            context.Session.Set(key, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value)));
+        }
 
         public bool TryParseJsonArrayGrades(string jsonString, out List<double> values)
         {
             try
             {
-                //values = JsonConvert.DeserializeObject<List<double>>(jsonString);
-                values = new List<double>();
+                values = JsonConvert.DeserializeObject<List<double>>(jsonString);
                 return values != null;
             }
             catch
