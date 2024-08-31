@@ -9,5 +9,6 @@ namespace Homee.Repositories.IRepositories
 {
     public interface ICategoryRepository : IBaseRepository<Category>
     {
+        int CanUpdate(int id, string name);
     }
 }

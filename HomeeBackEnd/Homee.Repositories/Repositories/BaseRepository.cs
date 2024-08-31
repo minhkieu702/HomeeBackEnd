@@ -1,4 +1,5 @@
 ﻿using Homee.DAO.DAO;
+using Homee.DataLayer;
 using Homee.Repositories.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -331,6 +332,17 @@ namespace Homee.Repositories.Repositories
                 throw new Exception(ex.Message);
             }
         }
+        public void Update(TEntity entity)
+        {
+            try
+            {
+                BaseDAO<TEntity>.Instance.Update(entity);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
         public async Task InsertAsync(TEntity entity)
         {
@@ -418,11 +430,23 @@ namespace Homee.Repositories.Repositories
             return result;
         }
 
-        public void SaveChages()
+        public int SaveChanges()
         {
             try
             {
-                BaseDAO<TEntity>.Instance.SaveChages();
+                return BaseDAO<TEntity>.Instance.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<int> SaveChangesAsync()
+        {
+            try
+            {
+                return await BaseDAO<TEntity>.Instance.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -476,6 +500,11 @@ namespace Homee.Repositories.Repositories
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        public HomeeDbContext GetDBContext()
+        {
+            return BaseDAO<TEntity>.Instance.GetDBContext();
         }
     }
 }

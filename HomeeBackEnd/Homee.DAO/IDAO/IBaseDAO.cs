@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Homee.DataLayer;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace Homee.DAO.IDAO
 {
     public interface IBaseDAO<TEntity> where TEntity : class
     {
+        public HomeeDbContext GetDBContext();
         public TEntity Find(Func<TEntity, bool> predicate);
         public IQueryable<TEntity> FindAll(Func<TEntity, bool> predicate);
         public Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> predicate);
@@ -24,6 +26,7 @@ namespace Homee.DAO.IDAO
         public Task InsertAsync(TEntity entity);
         public void Insert(TEntity entity);
         public void InsertRangeAsync(IQueryable<TEntity> entities);
+        public void Update(TEntity entity);
         public Task UpdateById(TEntity entity, int id);
         public Task UpdateGuid(TEntity entity, Guid id);
         public void UpdateRange(IQueryable<TEntity> entities);
@@ -38,7 +41,8 @@ namespace Homee.DAO.IDAO
         public int Count();
         public TEntity FistOrDefault(Func<TEntity, bool> predicate);
         public Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
-        public void SaveChages();
+        public int SaveChanges();
+        public Task<int> SaveChangesAsync();
         public bool IsMin(Func<TEntity, bool> predicate);
         public bool IsMax(Func<TEntity, bool> predicate);
         public TEntity GetMin();

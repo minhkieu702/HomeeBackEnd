@@ -26,7 +26,7 @@ namespace Homee.DAO.DAO
                 {
                     if (instance == null)
                     {
-                        HomeeDbContext context = new ();
+                        HomeeDbContext context = new();
                         instance = new BaseDAO<TEntity>(context);
                     }
                     return instance;
@@ -39,6 +39,8 @@ namespace Homee.DAO.DAO
             _context = context;
             Table = context.Set<TEntity>();
         }
+
+        public HomeeDbContext GetDBContext() => _context;
 
         public virtual bool Any(Func<TEntity, bool> predicate)
         {
@@ -158,15 +160,19 @@ namespace Homee.DAO.DAO
             await Table.AddAsync(entity);
         }
 
+        public void Update(TEntity entity)
+        {
+            Table.Update(entity);
+        }
+
         public async void InsertRangeAsync(IQueryable<TEntity> entities)
         {
             await Table.AddRangeAsync(entities);
         }
 
-        public void SaveChages()
-        {
-            _context.SaveChanges();
-        }
+        public int SaveChanges() => _context.SaveChanges();
+
+        public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();
 
         public async Task UpdateById(TEntity entity, int id)
         {
