@@ -4,36 +4,37 @@ using Homee.BusinessLayer.IServices;
 using Homee.DataLayer.RequestModels;
 using Homee.DataLayer.Models;
 using Homee.Repositories.IRepositories;
+using Homee.Repositories.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Homee.BusinessLayer.Services
 {
-    public class CategoryService : ICategoryService
+    public class PlaceService : IPlaceService
     {
         private readonly IMapper _mapper;
-        private readonly ICategoryRepository _categoryRepository;
+        private readonly IPlaceRepository _repo;
 
-        public CategoryService(IMapper mapper, ICategoryRepository categoryRepository)
+        public PlaceService(IMapper mapper, IPlaceRepository repository)
         {
             _mapper = mapper;
-            _categoryRepository = categoryRepository;
+            _repo = repository;
         }
 
         public async Task<IHomeeResult> Block(int id)
         {
             try
             {
-                var result = await _categoryRepository.GetById(id);
-                
+                var result = await _repo.GetById(id);
                 if (result == null) return new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
 
-                _categoryRepository.Delete(result);
-                
-                var check = await _categoryRepository.SaveChangesAsync();
+                result.IsBlock = true;
+                _repo.Update(result);
+                var check = await _repo.SaveChangesAsync();
 
                 return check <= 0 ? new HomeeResult(Const.FAIL_DELETE_CODE, Const.FAIL_DELETE_MSG) : new HomeeResult(Const.SUCCESS_DELETE_CODE, Const.SUCCESS_DELETE_MSG);
             }
@@ -42,12 +43,12 @@ namespace Homee.BusinessLayer.Services
                 return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
             }
         }
-        
+
         public async Task<IHomeeResult> GetAll()
         {
             try
             {
-                var result = _categoryRepository.GetCategories();
+                var result = _repo.GetPlaces();
                 return result.Count() <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result);
             }
             catch (Exception ex)
@@ -56,11 +57,11 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
-        public async Task<IHomeeResult> GetById(int categoryId)
+        public async Task<IHomeeResult> GetById(int id)
         {
             try
             {
-                var result = _categoryRepository.GetCategory(categoryId);
+                var result = _repo.GetPlace(id);
                 return result == null ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result);
             }
             catch (Exception ex)
@@ -69,40 +70,19 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
-        public async Task<IHomeeResult> GetByName(string categoryName)
+        public async Task<IHomeeResult> Insert(PlaceRequest model, HttpContext httpContext)
         {
             try
             {
-                var result = _categoryRepository.GetCategories();
-                if (result.Count() == 0)
+                bool result = await _repo.CanInsert(model);
+                if (!result)
                 {
-                    return new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
+                    return new HomeeResult(Const.FAIL_CREATE_CODE, "This address is already registered.");
                 }
-                var cates = result.Where(c => c.CategoryName.ToUpper().Trim().Equals(categoryName.ToUpper().Trim()));
-                
-                return cates == null ? 
-                    new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : 
-                    new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result);
-            }
-            catch (Exception ex)
-            {
-                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
-            }
-        }
-
-        public async Task<IHomeeResult> Insert(CategoryRequest model)
-        {
-            try
-            {
-                var result = await GetByName(model.CategoryName);
-                if (result.Status > 0)
-                {
-                    return new HomeeResult(Const.FAIL_CREATE_CODE, "This category already exist.");
-                }
-                await _categoryRepository.InsertAsync(_mapper.Map<Category>(model));
-                var check = await _categoryRepository.SaveChangesAsync();
-                return check <= 0 ? 
-                    new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG) : 
+                //await _repo.InsertPlace(_mapper.Map<Place>(model));
+                var check = await _repo.InsertPlace(model, httpContext);
+                return check <= 0 ?
+                    new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG) :
                     new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG);
             }
             catch (Exception ex)
@@ -111,20 +91,17 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
-        public async Task<IHomeeResult> Update(int id, CategoryRequest model)
+        public async Task<IHomeeResult> Update(int id, PlaceRequest model, HttpContext httpContext)
         {
             try
             {
-                var result = _categoryRepository.CanUpdate(id, model.CategoryName);
-                if (result == -1)
+                var result = await _repo.GetById(id);
+                if (result == null)
                 {
                     return new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);
                 }
-                var cate = _mapper.Map<Category>(model);
-                cate.CategoryId = id;
-                await _categoryRepository.UpdateById(cate, id);
-                var check = await _categoryRepository.SaveChangesAsync();
-                return check > 0 ? 
+                var check = await _repo.UpdatePlace(result, model, httpContext);
+                return check > 0 ?
                     new HomeeResult(Const.SUCCESS_UPDATE_CODE, Const.SUCCESS_UPDATE_MSG) :
                     new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);
             }
