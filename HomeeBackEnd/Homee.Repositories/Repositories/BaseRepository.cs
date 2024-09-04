@@ -1,5 +1,5 @@
 ﻿using Homee.DAO.DAO;
-using Homee.DataLayer;
+using Homee.DataLayer.Models;
 using Homee.Repositories.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
