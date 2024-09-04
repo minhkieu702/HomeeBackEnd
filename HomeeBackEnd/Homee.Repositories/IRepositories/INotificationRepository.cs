@@ -1,4 +1,4 @@
-﻿using Homee.DataLayer;
+﻿using Homee.DataLayer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
