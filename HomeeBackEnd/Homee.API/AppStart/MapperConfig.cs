@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
-using Homee.BusinessLayer.RequestModels;
-using Homee.DataLayer;
+using Homee.BusinessLayer.Commons;
+using Homee.DataLayer.RequestModels;
+using Homee.DataLayer.ResponseModels;
+using Homee.DataLayer.Models;
 
 namespace Homee.API.AppStart
 {
@@ -10,6 +12,18 @@ namespace Homee.API.AppStart
         {
             #region Category
             CreateMap<CategoryRequest, Category>().ReverseMap();
+            #endregion
+
+            #region Place
+            CreateMap<Place, PlaceResponse>()
+                .ForMember(dest => dest.Direction, opt => opt.MapFrom(src => ((PlaceDirection)src.Direction).ToString()))
+                .ReverseMap();
+            CreateMap<PlaceRequest, Place>().ReverseMap();
+            #endregion
+
+            #region Account
+            CreateMap<Account, AccountRequest>().ReverseMap();
+
             #endregion
         }
     }
