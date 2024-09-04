@@ -1,5 +1,5 @@
 ﻿using Homee.BusinessLayer.Commons;
-using Homee.BusinessLayer.RequestModels;
+using Homee.DataLayer.RequestModels;
 using Homee.DataLayer;
 using System;
 using System.Collections.Generic;
@@ -16,6 +16,6 @@ namespace Homee.BusinessLayer.IServices
         Task<IHomeeResult> GetAll();
         Task<IHomeeResult> Insert(CategoryRequest category);
         Task<IHomeeResult> Update(int id, CategoryRequest category);
-        Task<IHomeeResult> Delete(int id);
+        Task<IHomeeResult> Block(int id);
     }
 }
