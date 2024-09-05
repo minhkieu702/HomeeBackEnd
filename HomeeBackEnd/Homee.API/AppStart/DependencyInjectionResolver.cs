@@ -13,10 +13,11 @@ namespace Homee.API.AppStart
             services.AddSingleton(typeof(IBaseRepository<>), typeof(BaseRepository<>));
             services.AddSingleton(typeof(HomeeDbContext), typeof(HomeeDbContext));
 
+            services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IPlaceService, PlaceService>();
-            services.AddScoped<IAccountRepository, AccountRepository>();
 
+            services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IPlaceRepository, PlaceRepository>();
             services.AddScoped<IContractRepository, ContractRepository>();

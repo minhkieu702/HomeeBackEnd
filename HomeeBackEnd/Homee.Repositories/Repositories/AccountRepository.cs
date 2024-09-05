@@ -1,5 +1,7 @@
 ﻿using Homee.DataLayer.Models;
+using Homee.DataLayer.RequestModels;
 using Homee.Repositories.IRepositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +12,37 @@ namespace Homee.Repositories.Repositories
 {
     public class AccountRepository : BaseRepository<Account>, IAccountRepository
     {
+        private readonly HomeeDbContext _context;
+
+        public AccountRepository() { }
+        public AccountRepository(HomeeDbContext context)
+        {
+            _context = context;
+        }
+        public bool CanInsert(AccountRequest model)
+        {
+            var account = _context.Accounts.Where(c => c.Email == model.Email).FirstOrDefault();
+            return account != null;
+        }
+        public List<Account> GetAccounts()
+        {
+            return _context.Accounts
+                .Include(c => c.Places).ThenInclude(c => c.Contracts)
+                .Include(c => c.FavoritePosts).ThenInclude(c => c.Post)
+                .Include(c => c.Contracts).ThenInclude(c => c.Render)
+                .Include(c => c.Notifications)
+                .Include(c => c.Orders).ThenInclude(c => c.Subscription)
+                .ToList();
+        }
+        public Account GetAccount(int id)
+        {
+            return _context.Accounts
+                .Include(c => c.Places).ThenInclude(c => c.Contracts)
+                .Include(c => c.FavoritePosts).ThenInclude(c => c.Post)
+                .Include(c => c.Contracts).ThenInclude(c => c.Render)
+                .Include(c => c.Notifications)
+                .Include(c => c.Orders).ThenInclude(c => c.Subscription)
+                .ToList().FirstOrDefault(c => c.AccountId == id);
+        }
     }
 }
