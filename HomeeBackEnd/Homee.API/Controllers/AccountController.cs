@@ -20,7 +20,7 @@ namespace Homee.API.Controllers
         }
 
         [HttpPost("Create")]
-        public IActionResult Create([FromBody] AccountRequest category) => Ok(_service.Create(category).Result);
+        public IActionResult Create([FromBody] AccountRequest account) => Ok(_service.Create(account).Result);
 
         [HttpGet("GetAll")]
         public IActionResult GetAll() => Ok(_service.GetAll());
@@ -29,7 +29,7 @@ namespace Homee.API.Controllers
         public IActionResult GetById(int id) => Ok(_service.GetById(id));
 
         [HttpPut("Update/{id}")]
-        public IActionResult Update(int id, [FromBody] AccountRequest category) => Ok(_service.Update(id, category).Result);
+        public IActionResult Update(int id, [FromBody] AccountRequest account) => Ok(_service.Update(id, account).Result);
 
         [HttpDelete("Delete/{id}")]
         public IActionResult Block(int id) => Ok(_service.Block(id).Result);

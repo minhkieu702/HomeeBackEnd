@@ -12,5 +12,6 @@ namespace Homee.Repositories.IRepositories
     {
         bool CanInsert(AccountRequest model);
         Account GetAccount(int id);
+        List<Account> GetAccounts();
     }
 }

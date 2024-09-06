@@ -27,22 +27,29 @@ namespace Homee.Repositories.Repositories
         public List<Account> GetAccounts()
         {
             return _context.Accounts
-                .Include(c => c.Places).ThenInclude(c => c.Contracts)
-                .Include(c => c.FavoritePosts).ThenInclude(c => c.Post)
-                .Include(c => c.Contracts).ThenInclude(c => c.Render)
-                .Include(c => c.Notifications)
-                .Include(c => c.Orders).ThenInclude(c => c.Subscription)
+                //.Include(c => c.Places).ThenInclude(c => c.Contracts)
+                //.Include(c => c.FavoritePosts).ThenInclude(c => c.Post)
+                //.Include(c => c.Contracts).ThenInclude(c => c.Render)
+                //.Include(c => c.Notifications)
+                //.Include(c => c.Orders).ThenInclude(c => c.Subscription)
                 .ToList();
         }
         public Account GetAccount(int id)
         {
-            return _context.Accounts
-                .Include(c => c.Places).ThenInclude(c => c.Contracts)
-                .Include(c => c.FavoritePosts).ThenInclude(c => c.Post)
-                .Include(c => c.Contracts).ThenInclude(c => c.Render)
+            var account = _context.Accounts
+                //.Include(c => c.Places).ThenInclude(c => c.CategoryPlaces).ThenInclude(c => c.Category)
+                //.Include(c => c.Contracts)
+                //.Include(c => c.FavoritePosts).ThenInclude(c => c.Post)
+                //.Include(c => c.Contracts).ThenInclude(c => c.Render)
                 .Include(c => c.Notifications)
                 .Include(c => c.Orders).ThenInclude(c => c.Subscription)
                 .ToList().FirstOrDefault(c => c.AccountId == id);
+            foreach (var order in account.Orders)
+            {
+                order.Subscription.Orders = null;
+            }
+            return account;
         }
+
     }
 }

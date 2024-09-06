@@ -3,22 +3,17 @@ using Homee.BusinessLayer.Commons;
 using Homee.BusinessLayer.IServices;
 using Homee.DataLayer.Models;
 using Homee.DataLayer.RequestModels;
+using Homee.Repositories.IRepositories;
 using Homee.Repositories.Repositories;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Homee.BusinessLayer.Services
 {
     public class AccountService : IAccountService
     {
         private readonly IMapper _mapper;
-        private readonly AccountRepository _repo;
+        private readonly IAccountRepository _repo;
 
-        public AccountService(IMapper mapper, AccountRepository accountRepository)
+        public AccountService(IMapper mapper, IAccountRepository accountRepository)
         {
             _mapper = mapper;
             _repo = accountRepository;
@@ -47,11 +42,13 @@ namespace Homee.BusinessLayer.Services
             try
             {
                 bool result = _repo.CanInsert(model);
-                if (!result)
+                if (result)
                 {
                     return new HomeeResult(Const.FAIL_CREATE_CODE, "This email is already used.");
                 }
-                await _repo.InsertAsync(_mapper.Map<Account>(model));
+                var account = _mapper.Map<Account>(model);
+                account.CreatedAt = account.UpdatedAt = DateTime.Now;
+                await _repo.InsertAsync(account);
                 var check = await _repo.SaveChangesAsync();
                 return check <= 0 ?
                     new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG) :
@@ -67,7 +64,7 @@ namespace Homee.BusinessLayer.Services
         {
             try
             {
-                var result = _repo.GetAccounts();
+                List<Account> result = _repo.GetAccounts();
                 return result.Count() <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result);
             }
             catch (Exception ex)
@@ -81,7 +78,7 @@ namespace Homee.BusinessLayer.Services
             try
             {
                 var result = _repo.GetAccount(id);
-                return result != null ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result);
+                return result == null ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result);
             }
             catch (Exception ex)
             {
@@ -108,9 +105,34 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
-        public Task<IHomeeResult> Update(int id, AccountRequest model)
+        public async Task<IHomeeResult> Update(int id, AccountRequest model)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await _repo.GetById(id);
+                if (result == null)
+                {
+                    return new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);
+                }
+                
+                result.UpdatedAt = DateTime.Now;
+                result.Password = model.Password;
+                result.ImageUrl = model.ImageUrl;
+                result.Name = model.Name;
+                result.Phone = model.Phone;
+                result.CitizenId = model.CitizenId;
+                result.BirthDay = model.BirthDay;
+
+                _repo.Update(result);
+                var check = await _repo.SaveChangesAsync();
+                return check <= 0 ?
+                    new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG) :
+                new HomeeResult(Const.SUCCESS_UPDATE_CODE, Const.SUCCESS_UPDATE_MSG);
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
         }
     }
 }

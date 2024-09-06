@@ -21,7 +21,7 @@ public partial class Account
 
     public int Role { get; set; }
 
-    public DateOnly? BirthDay { get; set; }
+    public DateTime? BirthDay { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
