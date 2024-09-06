@@ -9,11 +9,11 @@ public partial class Subscription
 
     public double Price { get; set; }
 
-    public TimeOnly Duration { get; set; }
-
     public string SubscriptionName { get; set; } = null!;
 
     public string? Description { get; set; }
+
+    public long? Duration { get; set; }
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 }

@@ -30,7 +30,7 @@ namespace Homee.API.Controllers
         [HttpPut("Update/{id}")]
         public IActionResult Update(int id, [FromBody] PlaceRequest category) => Ok(_placeService.Update(id, category, HttpContext).Result);
 
-        [HttpDelete("Block/{id}")]
+        [HttpPatch("Block/{id}")]
         public IActionResult Block(int id) => Ok(_placeService.Block(id).Result);
     }
 }
