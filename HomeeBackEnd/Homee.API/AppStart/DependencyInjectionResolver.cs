@@ -16,6 +16,7 @@ namespace Homee.API.AppStart
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IPlaceService, PlaceService>();
+            services.AddScoped<IContractService, ContractService>();
 
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
