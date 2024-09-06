@@ -11,9 +11,9 @@ public partial class Contract
 
     public int PlaceId { get; set; }
 
-    public TimeOnly Duration { get; set; }
-
     public DateTime CreatedAt { get; set; }
+
+    public long? Duration { get; set; }
 
     public virtual Place Place { get; set; } = null!;
 

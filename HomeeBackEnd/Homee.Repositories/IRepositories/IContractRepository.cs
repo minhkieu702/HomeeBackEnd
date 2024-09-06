@@ -1,4 +1,5 @@
 ﻿using Homee.DataLayer.Models;
+using Homee.DataLayer.RequestModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,5 +10,8 @@ namespace Homee.Repositories.IRepositories
 {
     public interface IContractRepository : IBaseRepository<Contract>
     {
+        List<Contract> GetContracts();
+        Contract GetContract(int id);
+        bool CanCreate(ContractRequest request);
     }
 }
