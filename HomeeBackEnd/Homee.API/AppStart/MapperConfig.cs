@@ -29,6 +29,10 @@ namespace Homee.API.AppStart
             #region Contract
             CreateMap<Contract, ContractRequest>().ReverseMap();
             #endregion
+
+            #region Interior
+            CreateMap<Interior, InteriorRequest>().ReverseMap();
+            #endregion
         }
     }
 }

@@ -29,10 +29,9 @@ namespace Homee.DataLayer.RequestModels
         public int NumberOfBedroom { get; set; }
 
         public double Rent { get; set; }
+
         public List<int> Categories { get; set; } = [];
-        [JsonIgnore]
-        public int OwnerId { get; set; } = 1;
-        [JsonIgnore]
-        public bool? IsBlock { get; set; } = false;
+        
+        public List<InteriorRequest> Interiors { get; set; } = [];
     }
 }
