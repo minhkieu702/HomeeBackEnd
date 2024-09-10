@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Homee.DataLayer.ResponseModels;
 
 namespace Homee.BusinessLayer.Services
 {
@@ -49,7 +50,7 @@ namespace Homee.BusinessLayer.Services
             try
             {
                 var result = _repo.GetPlaces();
-                return result.Count() <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result);
+                return result.Count() <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(_mapper.Map<InteriorResponse>));
             }
             catch (Exception ex)
             {
@@ -62,7 +63,7 @@ namespace Homee.BusinessLayer.Services
             try
             {
                 var result = _repo.GetPlace(id);
-                return result == null ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result);
+                return result == null ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, _mapper.Map<PlaceResponse>(result));
             }
             catch (Exception ex)
             {

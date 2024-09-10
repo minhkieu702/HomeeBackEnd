@@ -9,26 +9,33 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Homee.BusinessLayer.Services
 {
-    public class InteriorService : IInteriorService
+    public class OrderService : IOrderService
     {
-        private readonly IInteriorRepository _repo;
-        private readonly IMapper _mapper;
+        private readonly IMapper _mappper;
+        private readonly IOrderRepository _repo;
 
-        public InteriorService(IMapper mapper, IInteriorRepository interiorRepository)
+        public OrderService(IMapper mapper, IOrderRepository orderRepository)
         {
-            _repo = interiorRepository;
-            _mapper = mapper;
+            _mappper = mapper;
+            _repo = orderRepository;
         }
-        public async Task<IHomeeResult> Create(InteriorRequest model)
+        public async Task<IHomeeResult> Create(OrderRequest model)
         {
             try
             {
-                await _repo.InsertAsync(_mapper.Map<Interior>(model));
+                //bool result = await _repo.CanInsert(model);
+                //if (!result)
+                //{
+                //    return new HomeeResult(Const.FAIL_CREATE_CODE, "This address is already registered.");
+                //}
+                //await _repo.InsertPlace(_mapper.Map<Place>(model));
+                _repo.Insert(_mappper.Map<Order>(model));
                 var check = await _repo.SaveChangesAsync();
                 return check <= 0 ?
                     new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG) :
@@ -62,21 +69,8 @@ namespace Homee.BusinessLayer.Services
         {
             try
             {
-                var result = _repo.GetInteriors();
-                return result.Count() <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(c => _mapper.Map<InteriorResponse>(c)));
-            }
-            catch (Exception ex)
-            {
-                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
-            }
-        }
-
-        public async Task<IHomeeResult> GetByPlace(int placeid)
-        {
-            try
-            {
-                var result = _repo.GetByPlace(placeid);
-                return result.Count() <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(c => _mapper.Map<InteriorResponse>(c)));
+                var result = _repo.GetAllOrders();
+                return result == null ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(_mappper.Map<ContractResponse>));
             }
             catch (Exception ex)
             {
@@ -88,8 +82,8 @@ namespace Homee.BusinessLayer.Services
         {
             try
             {
-                var result = await _repo.GetInterior(id);
-                return result == null ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, _mapper.Map<InteriorResponse>(result));
+                var result = _repo.GetOrder(id);
+                return result == null ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, _mappper.Map<OrderResponse>(result));
             }
             catch (Exception ex)
             {
@@ -97,7 +91,7 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
-        public async Task<IHomeeResult> Update(int id, InteriorRequest model)
+        public async Task<IHomeeResult> Update(int id, OrderRequest model)
         {
             try
             {
@@ -106,13 +100,7 @@ namespace Homee.BusinessLayer.Services
                 {
                     return new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);
                 }
-                
-                result.Status = model.Status;
-                result.InteriorName = model.InteriorName;
-                result.Description = model.Description;
-
-                _repo.Update(result);
-                var check = await _repo.SaveChangesAsync();
+                var check = await _repo.UpdatePlace(result, model);
                 return check > 0 ?
                     new HomeeResult(Const.SUCCESS_UPDATE_CODE, Const.SUCCESS_UPDATE_MSG) :
                     new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);
