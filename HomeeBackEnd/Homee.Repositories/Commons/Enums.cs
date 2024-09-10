@@ -8,8 +8,7 @@ namespace Homee.BusinessLayer.Commons
 {
     public enum AccountRole
     {
-        Owner,
-        Render,
+        Customer,
         Staff,
         Manager,
         Administrator

@@ -23,7 +23,7 @@ namespace Homee.DataLayer.ResponseModels
 
         public double Area { get; set; }
 
-        public string Direction { get; set; }
+        public string  Direction { get; set; }
 
         public int NumberOfToilet { get; set; }
 
@@ -35,14 +35,10 @@ namespace Homee.DataLayer.ResponseModels
 
         public bool? IsBlock { get; set; }
 
-        public virtual ICollection<Contract> Contracts { get; set; } = new List<Contract>();
+        public virtual ICollection<InteriorResponse> Interiors { get; set; } = new List<InteriorResponse>();
 
-        public virtual ICollection<Interior> Interiors { get; set; } = new List<Interior>();
+        public virtual AccountResponse Owner { get; set; } = null!;
 
-        public virtual Account Owner { get; set; } = null!;
-
-        public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
-
-        public virtual ICollection<Category> Categories { get; set; } = new List<Category>();
+        public virtual ICollection<CategoryPlaceResponse> CategoryPlaces { get; set; } = new List<CategoryPlaceResponse>();
     }
 }
