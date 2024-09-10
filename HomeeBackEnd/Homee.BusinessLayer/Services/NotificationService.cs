@@ -1,6 +1,7 @@
 ﻿using Homee.BusinessLayer.Commons;
 using Homee.BusinessLayer.IServices;
 using Homee.DataLayer.RequestModels;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,11 @@ namespace Homee.BusinessLayer.Services
         }
 
         public Task<IHomeeResult> Delete(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IHomeeResult> GetByCurrentUser(HttpContext context)
         {
             throw new NotImplementedException();
         }

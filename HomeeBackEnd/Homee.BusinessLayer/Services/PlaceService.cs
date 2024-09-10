@@ -58,6 +58,11 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
+        public Task<IHomeeResult> GetByCurrentUser(HttpContext context)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<IHomeeResult> GetById(int id)
         {
             try

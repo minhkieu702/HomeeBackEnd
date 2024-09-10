@@ -70,7 +70,7 @@ namespace Homee.BusinessLayer.Services
             try
             {
                 var result = _repo.GetAllOrders();
-                return result == null ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(_mappper.Map<ContractResponse>));
+                return result.Count() == 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(_mappper.Map<ContractResponse>));
             }
             catch (Exception ex)
             {

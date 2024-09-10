@@ -36,8 +36,10 @@ namespace Homee.DataLayer.ResponseModels
         public bool IsGoogleAuthenticated { get; set; }
 
         public bool IsBlock { get; set; }
+        
+        public OrderResponse? LastOrder { get; set; }
 
-        public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+        public virtual ICollection<NotificationResponse> Notifications { get; set; } = [];
 
         public virtual ICollection<OrderResponse> Orders { get; set; } = new List<OrderResponse>();
     }
