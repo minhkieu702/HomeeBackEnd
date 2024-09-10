@@ -22,10 +22,10 @@ namespace Homee.API.Controllers
         public IActionResult Create([FromBody] PlaceRequest category) => Ok(_placeService.Insert(category, HttpContext).Result);
 
         [HttpGet("GetAll")]
-        public IActionResult GetAll() => Ok(_placeService.GetAll());
+        public IActionResult GetAll() => Ok(_placeService.GetAll().Result);
 
         [HttpGet("GetById/{id}")]
-        public IActionResult GetById(int id) => Ok(_placeService.GetById(id));
+        public IActionResult GetById(int id) => Ok(_placeService.GetById(id).Result);
 
         [HttpPut("Update/{id}")]
         public IActionResult Update(int id, [FromBody] PlaceRequest category) => Ok(_placeService.Update(id, category, HttpContext).Result);

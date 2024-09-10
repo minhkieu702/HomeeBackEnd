@@ -61,6 +61,10 @@ namespace Homee.API.AppStart
             CreateMap<Subscription, SubscriptionRequest>().ReverseMap();
             CreateMap<Subscription, SubscriptionResponse>().ReverseMap();
             #endregion
+
+            #region CategoryPlace
+            CreateMap<CategoryPlace, CategoryPlaceResponse>().ReverseMap();
+            #endregion
         }
     }
 }

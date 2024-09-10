@@ -16,5 +16,6 @@ namespace Homee.BusinessLayer.IServices
         Task<IHomeeResult> Update(int id, InteriorRequest model);
         Task<IHomeeResult> Delete(int id);
         Task<IHomeeResult> Create(InteriorRequest model);
+        Task<IHomeeResult> GetByPlace(int placeid);
     }
 }
