@@ -3,6 +3,7 @@ using Homee.BusinessLayer.Commons;
 using Homee.BusinessLayer.IServices;
 using Homee.DataLayer.Models;
 using Homee.DataLayer.RequestModels;
+using Homee.DataLayer.ResponseModels;
 using Homee.Repositories.IRepositories;
 using Homee.Repositories.Repositories;
 
@@ -65,7 +66,7 @@ namespace Homee.BusinessLayer.Services
             try
             {
                 List<Account> result = _repo.GetAccounts();
-                return result.Count() <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result);
+                return result.Count() <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(_mapper.Map<AccountResponse>));
             }
             catch (Exception ex)
             {
@@ -78,7 +79,7 @@ namespace Homee.BusinessLayer.Services
             try
             {
                 var result = _repo.GetAccount(id);
-                return result == null ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result);
+                return result == null ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, _mapper.Map<AccountResponse>(result));
             }
             catch (Exception ex)
             {
@@ -97,7 +98,7 @@ namespace Homee.BusinessLayer.Services
                 }
                 var account = result.FirstOrDefault(c => c.Email.Equals(email) && c.Password.Equals(password));
                 
-                return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, account);
+                return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, _mapper.Map<AccountResponse>(result));
             }
             catch (Exception ex)
             {

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Homee.DataLayer.ResponseModels;
 
 namespace Homee.BusinessLayer.Services
 {
@@ -48,7 +49,7 @@ namespace Homee.BusinessLayer.Services
             try
             {
                 var result = _categoryRepository.GetCategories();
-                return result.Count() <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result);
+                return result.Count() <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(_mapper.Map<CategoryResponse>));
             }
             catch (Exception ex)
             {
@@ -61,7 +62,7 @@ namespace Homee.BusinessLayer.Services
             try
             {
                 var result = _categoryRepository.GetCategory(categoryId);
-                return result == null ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result);
+                return result == null ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, _mapper.Map<CategoryResponse>(result));
             }
             catch (Exception ex)
             {
@@ -82,7 +83,7 @@ namespace Homee.BusinessLayer.Services
                 
                 return cates == null ? 
                     new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : 
-                    new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result);
+                    new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(_mapper.Map<CategoryResponse>));
             }
             catch (Exception ex)
             {
@@ -115,14 +116,13 @@ namespace Homee.BusinessLayer.Services
         {
             try
             {
-                var result = _categoryRepository.CanUpdate(id, model.CategoryName);
-                if (result == -1)
+                var result = await _categoryRepository.GetById(id);
+                if (result == null)
                 {
                     return new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);
                 }
-                var cate = _mapper.Map<Category>(model);
-                cate.CategoryId = id;
-                await _categoryRepository.UpdateById(cate, id);
+                result.CategoryName = model.CategoryName;
+                _categoryRepository.Update(result);
                 var check = await _categoryRepository.SaveChangesAsync();
                 return check > 0 ? 
                     new HomeeResult(Const.SUCCESS_UPDATE_CODE, Const.SUCCESS_UPDATE_MSG) :
