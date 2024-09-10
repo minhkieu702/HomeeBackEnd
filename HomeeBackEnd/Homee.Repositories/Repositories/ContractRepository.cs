@@ -33,14 +33,14 @@ namespace Homee.Repositories.Repositories
             try
             {
                 var contract = _context.Contracts.Include(c => c.Render).Include(c => c.Place).ThenInclude(c => c.Owner).FirstOrDefault(c => c.ContractId == id);
-                if (contract == null) 
-                { 
-                contract.Render.Contracts = null;
-                contract.Render.Places = null;
-                contract.Place.Contracts = null;
-                contract.Place.Owner.Contracts = null;
-                contract.Place.Owner.Places = null;
-                }
+                //if (contract == null) 
+                //{ 
+                //contract.Render.Contracts = null;
+                //contract.Render.Places = null;
+                //contract.Place.Contracts = null;
+                //contract.Place.Owner.Contracts = null;
+                //contract.Place.Owner.Places = null;
+                //}
                 return contract;
             }
             catch (Exception)
@@ -53,14 +53,14 @@ namespace Homee.Repositories.Repositories
         public List<Contract> GetContracts()
         {
             var contracts = _context.Contracts.Include(c => c.Render).Include(c => c.Place).ThenInclude(c => c.Owner).ToList();
-            foreach (var contract in contracts)
-            {
-                contract.Render.Contracts = null;
-                contract.Render.Places = null;
-                contract.Place.Contracts = null;
-                contract.Place.Owner.Contracts = null;
-                contract.Place.Owner.Places = null;
-            }
+            //foreach (var contract in contracts)
+            //{
+            //    contract.Render.Contracts = null;
+            //    contract.Render.Places = null;
+            //    contract.Place.Contracts = null;
+            //    contract.Place.Owner.Contracts = null;
+            //    contract.Place.Owner.Places = null;
+            //}
             return contracts;
         }
     }

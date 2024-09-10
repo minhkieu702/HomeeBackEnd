@@ -19,7 +19,7 @@ namespace Homee.Repositories.Repositories
 
         public PlaceRepository()
         {
-            
+
         }
         public PlaceRepository(HomeeDbContext context)
         {
@@ -28,35 +28,54 @@ namespace Homee.Repositories.Repositories
         public async Task<bool> CanInsert(PlaceRequest model)
         {
             string address = model.Province.Trim() + model.Distinct.Trim() + model.Ward.Trim() + model.Street.Trim() + model.Number.Trim();
-            var place = _context.Places.FirstOrDefault(p => address.ToUpper().Equals(p.Province.Trim()+p.Distinct.Trim()+model.Ward.Trim()+model.Street.Trim()+model.Number.Trim()));
+            var place = _context.Places.FirstOrDefault(p => address.ToUpper().Equals(p.Province.Trim() + p.Distinct.Trim() + model.Ward.Trim() + model.Street.Trim() + model.Number.Trim()));
             return place == null;
         }
 
         public Place GetPlace(int id)
         {
-            var places = _context.Places.Where(c => c.PlaceId == id).Include(p => p.CategoryPlaces).ThenInclude(c => c.Category).ToList();
-            foreach (var place in places)
-            {
-                foreach (var item in place.CategoryPlaces)
-                {
-                    item.Category.CategoryPlaces = null;
-                    item.Place = null;
-                }
-            }
-            return places.FirstOrDefault();
+            return GetPlaces().FirstOrDefault(c => c.PlaceId == id);
         }
 
         public List<Place> GetPlaces()
         {
-            var places = _context.Places.Include(p => p.CategoryPlaces).ThenInclude(c => c.Category).ToList();
-            foreach (var place in places)
-            {
-                foreach (var item in place.CategoryPlaces)
-                {
-                    item.Category.CategoryPlaces = null;
-                    item.Place = null;
-                }
-            }
+            var places = _context.Places.AsNoTracking()
+                .Include(p => p.CategoryPlaces).ThenInclude(c => c.Category)
+                .Include(p => p.Interiors)
+                .Include(p => p.Posts).ThenInclude(c => c.Images)
+                .Include(p => p.Owner).IgnoreAutoIncludes()
+                .ToList();
+            //foreach (var place in places)
+            //{
+            //    if (place.CategoryPlaces.Count() > 0)
+            //    {
+            //        foreach (var item in place.CategoryPlaces)
+            //        {
+            //            item.Category.CategoryPlaces = null;
+            //            item.Place = null;
+            //        }
+            //    }
+
+            //    if (place.Interiors.Count() > 0)
+            //    {
+            //        foreach (var item in place.Interiors)
+            //        {
+            //            item.Place = null;
+            //        }
+            //    }
+
+            //    if (place.Contracts.Count() > 0)
+            //    {
+            //        foreach (var item in place.Contracts)
+            //        {
+            //            item.Place = null;
+            //            item.Render.Places = null;
+            //        }
+            //    }
+
+            //    place.Owner.Places = null;
+            //    place.Owner.Contracts = null;
+            //}
             return places;
         }
         private int GetUserId(HttpContext httpContext)
@@ -106,17 +125,34 @@ namespace Homee.Repositories.Repositories
                     {
                         transaction.Rollback();
                     }
-                    bool flag = false;
+
+                    var flag1 = false;
+                    var flag2 = false;
+
                     foreach (var cid in model.Categories)
                     {
                         var cate = _context.Categories.FirstOrDefault(c => c.CategoryId == cid);
                         if (cate != null)
                         {
                             _context.CategoryPlaces.Add(new CategoryPlace { CategoryId = cid, PlaceId = place.PlaceId });
-                            flag = true;
+                            flag1 = true;
                         }
                     }
-                    if (flag)
+
+                    foreach (var interior in model.Interiors)
+                    {
+                        _context.Interiors.Add(new Interior
+                        {
+                            Description = interior.Description,
+                            InteriorName = interior.InteriorName,
+                            Status = interior.Status,
+                            PlaceId = place.PlaceId,
+                        });
+                        flag2 = true;
+
+                    }
+
+                    if (flag1 || flag2)
                     {
                         check = await _context.SaveChangesAsync();
                         if (check <= 0)
@@ -124,7 +160,7 @@ namespace Homee.Repositories.Repositories
                             transaction.Rollback();
                         }
                     }
-                    if (check >0)
+                    if (check > 0)
                     {
                         transaction.Commit();
                     }
