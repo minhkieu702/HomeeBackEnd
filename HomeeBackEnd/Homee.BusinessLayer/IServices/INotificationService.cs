@@ -1,5 +1,6 @@
 ﻿using Homee.BusinessLayer.Commons;
 using Homee.DataLayer.RequestModels;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +16,6 @@ namespace Homee.BusinessLayer.IServices
         Task<IHomeeResult> GetById(int id);
         Task<IHomeeResult> Create(NotificationRequest model);
         Task<IHomeeResult> GetByContent(string keyword);
+        Task<IHomeeResult> GetByCurrentUser(HttpContext context);
     }
 }

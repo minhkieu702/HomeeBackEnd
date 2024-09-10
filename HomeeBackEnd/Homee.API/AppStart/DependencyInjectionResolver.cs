@@ -10,8 +10,8 @@ namespace Homee.API.AppStart
     {
         public static void ConfigDI(this IServiceCollection services)
         {
-            services.AddSingleton(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-            services.AddSingleton(typeof(HomeeDbContext), typeof(HomeeDbContext));
+            services.AddTransient(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+            services.AddTransient(typeof(HomeeDbContext), typeof(HomeeDbContext));
 
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ICategoryService, CategoryService>();
