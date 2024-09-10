@@ -16,5 +16,6 @@ namespace Homee.BusinessLayer.IServices
         Task<IHomeeResult> Insert(PlaceRequest model, HttpContext httpContext);
         Task<IHomeeResult> Update(int id, PlaceRequest model, HttpContext httpContext);
         Task<IHomeeResult> Block(int id);
+        Task<IHomeeResult> GetByCurrentUser(HttpContext context);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Homee.BusinessLayer.Commons;
 using Homee.DataLayer.RequestModels;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +16,6 @@ namespace Homee.BusinessLayer.IServices
         Task<IHomeeResult> Update(int id, PostRequest model);
         Task<IHomeeResult> Delete(int id);
         Task<IHomeeResult> Create(PostRequest model);
+        Task<IHomeeResult> GetByCurrentUser(HttpContext context);
     }
 }

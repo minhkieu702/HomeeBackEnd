@@ -114,5 +114,10 @@ namespace Homee.BusinessLayer.Services
                 return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
             }
         }
+
+        public Task<IHomeeResult> GetByCurrentUser(HttpContext context)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -6,6 +6,8 @@ using Homee.DataLayer.RequestModels;
 using Homee.DataLayer.ResponseModels;
 using Homee.Repositories.IRepositories;
 using Homee.Repositories.Repositories;
+using Microsoft.Identity.Client;
+using System.Security.Principal;
 
 namespace Homee.BusinessLayer.Services
 {
@@ -66,7 +68,16 @@ namespace Homee.BusinessLayer.Services
             try
             {
                 List<Account> result = _repo.GetAccounts();
-                return result.Count() <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(_mapper.Map<AccountResponse>));
+                if (result.Count() <= 0)
+                {
+                    new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
+                }
+                var accounts = result.Select(_mapper.Map<AccountResponse>);
+                foreach (var account in accounts)
+                {
+                    account.LastOrder = account.Orders.Where(c => c.OwnerId == account.AccountId && c.ExpiredAt > DateTime.Now).LastOrDefault();
+                }
+                return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, accounts);
             }
             catch (Exception ex)
             {
@@ -79,7 +90,13 @@ namespace Homee.BusinessLayer.Services
             try
             {
                 var result = _repo.GetAccount(id);
-                return result == null ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, _mapper.Map<AccountResponse>(result));
+                if (result == null)
+                {
+                    new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
+                }
+                var account = _mapper.Map<AccountResponse>(result);
+                account.LastOrder = account.Orders.Where(c => c.OwnerId == account.AccountId && c.ExpiredAt > DateTime.Now).LastOrDefault();
+                return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, account);
             }
             catch (Exception ex)
             {
