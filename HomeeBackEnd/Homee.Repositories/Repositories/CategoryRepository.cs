@@ -20,13 +20,18 @@ namespace Homee.Repositories.Repositories
         {
             _context = homeeDbContext;
         }
-        public int CanUpdate (int id, string name)
-        {
-            var category = GetAll().FirstOrDefault(c => c.CategoryId == id);
-            if (category == null) return -1;
-            if (category.CategoryName.ToUpper().Trim().Equals(name.ToUpper().Trim())) return 0;
-            return 1;
-        }
+        //public int CanUpdate (int id, string name, out Category cate)
+        //{
+        //    var category = GetAll().FirstOrDefault(c => c.CategoryId == id);
+        //    if (category == null)
+        //    {
+        //        cate = null;
+        //        return -1;
+        //    }
+
+        //    if (category.CategoryName.ToUpper().Trim().Equals(name.ToUpper().Trim())) return 0;
+        //    return 1;
+        //}
 
         public Category GetCategory(int id)
         {
@@ -35,15 +40,13 @@ namespace Homee.Repositories.Repositories
 
         public List<Category> GetCategories()
         {
-            var cates = _context.Categories.ToList();
+            var cates = _context.Categories.Include(c => c.CategoryPlaces).ThenInclude(c => c.Place).ToList();
             foreach (var cate in cates)
             {
-                cate.CategoryPlaces = _context.CategoryPlaces.Where(c => c.CategoryId == cate.CategoryId).ToList();
-                foreach (var cp in cate.CategoryPlaces)
+                foreach (var categoryPlace in cate.CategoryPlaces)
                 {
-                    cp.Category = null;
-                    var place = _context.Places.FirstOrDefault(c => c.PlaceId == cp.PlaceId);
-                    place.CategoryPlaces = null;
+                    categoryPlace.Category = null;
+                    categoryPlace.Place.CategoryPlaces = null;
                 }
             }
             return cates;

@@ -9,5 +9,8 @@ namespace Homee.Repositories.IRepositories
 {
     public interface IInteriorRepository : IBaseRepository<Interior>
     {
+        IEnumerable<Interior> GetByPlace(int id);
+        Task<Interior> GetInterior(int id);
+        IEnumerable<Interior> GetInteriors();
     }
 }
