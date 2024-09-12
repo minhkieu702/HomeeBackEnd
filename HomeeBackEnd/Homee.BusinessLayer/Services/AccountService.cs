@@ -66,7 +66,7 @@ namespace Homee.BusinessLayer.Services
                 return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
             }
         }
-        public async Task<IHomeeResult> ConfirmEmail(string email, HttpContext context)
+        public async Task<IHomeeResult> ConfirmEmaiToRegister(string email, HttpContext context)
         {
             try
             {
@@ -75,12 +75,41 @@ namespace Homee.BusinessLayer.Services
                 {
                     return new HomeeResult(Const.FAIL_CREATE_CODE, "This email is already used.");
                 }
+                var result = await SendOtp(email, context);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
+        }
+        public async Task<IHomeeResult> ConfirmEmaiToGetNewPassword(string email, HttpContext context)
+        {
+            try
+            {
+                var accounts = _repo.GetAll();
+                if (!accounts.Any(c => c.Email.Equals(email)))
+                {
+                    return new HomeeResult(Const.FAIL_CREATE_CODE, "This email does already not exist.");
+                }
+                var result = await SendOtp(email, context);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
+        }
+        private async Task<IHomeeResult> SendOtp(string email, HttpContext context)
+        {
+            try
+            {
                 var otp = SupportingFeature.Instance.GenerateOTP();
                 var result = await _mailService.SendMail(email, "CONFIRMING CODE", otp);
                 if (result.Status > 0)
                 {
-                    SupportingFeature.Instance.SetValueToSession("otp", otp, context);
-                    SupportingFeature.Instance.SetValueToSession("email", email, context);
+                    SupportingFeature.SetValueToSession("otp", otp, context);
+                    SupportingFeature.SetValueToSession("email", email, context);
                 }
                 return result;
             }
@@ -110,7 +139,28 @@ namespace Homee.BusinessLayer.Services
                 return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
             }
         }
-
+        public async Task<IHomeeResult> Register(AccountRequest model, HttpContext context)
+        {
+            try
+            {
+                if (!SupportingFeature.GetValueFromSession("email", out string email, context))
+                {
+                    return new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
+                }
+                model.Email = email;
+                model.Role = 0;
+                var account = _mapper.Map<Account>(model);
+                account.CreatedAt = DateTime.Now;
+                account.UpdatedAt = DateTime.Now;
+                _repo.Insert(account);
+                var check = await _repo.SaveChangesAsync();
+                return check > 0 ? new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG) : new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
+        }
         public async Task<IHomeeResult> GetById(int id)
         {
             try
