@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using Homee.BusinessLayer.Commons;
+using Homee.BusinessLayer.Helpers;
 using Homee.BusinessLayer.IServices;
 using Homee.DataLayer.Models;
 using Homee.DataLayer.RequestModels;
 using Homee.DataLayer.ResponseModels;
 using Homee.Repositories.IRepositories;
 using Homee.Repositories.Repositories;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Identity.Client;
 using System.Security.Principal;
 
@@ -13,11 +15,13 @@ namespace Homee.BusinessLayer.Services
 {
     public class AccountService : IAccountService
     {
+        private readonly IMailService _mailService;
         private readonly IMapper _mapper;
         private readonly IAccountRepository _repo;
 
-        public AccountService(IMapper mapper, IAccountRepository accountRepository)
+        public AccountService(IMapper mapper, IAccountRepository accountRepository, IMailService mailService)
         {
+            _mailService = mailService;
             _mapper = mapper;
             _repo = accountRepository;
         }
@@ -62,7 +66,29 @@ namespace Homee.BusinessLayer.Services
                 return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
             }
         }
-
+        public async Task<IHomeeResult> ConfirmEmail(string email, HttpContext context)
+        {
+            try
+            {
+                var accounts = _repo.GetAll();
+                if (accounts.Any(c => c.Email.Equals(email)))
+                {
+                    return new HomeeResult(Const.FAIL_CREATE_CODE, "This email is already used.");
+                }
+                var otp = SupportingFeature.Instance.GenerateOTP();
+                var result = await _mailService.SendMail(email, "CONFIRMING CODE", otp);
+                if (result.Status > 0)
+                {
+                    SupportingFeature.Instance.SetValueToSession("otp", otp, context);
+                    SupportingFeature.Instance.SetValueToSession("email", email, context);
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
+        }
         public async Task<IHomeeResult> GetAll()
         {
             try

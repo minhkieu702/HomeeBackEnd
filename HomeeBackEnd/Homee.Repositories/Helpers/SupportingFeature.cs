@@ -41,7 +41,21 @@ namespace Homee.BusinessLayer.Helpers
                 }
             }
         }
+        public string GenerateOTP()
+        {
+            // Create a random number generator
+            Random random = new Random();
 
+            // Generate a random number with the specified length
+            string otp = string.Empty;
+
+            for (int i = 0; i < 6; i++)
+            {
+                otp += random.Next(0, 10); // Append a digit between 0 and 9
+            }
+
+            return otp;
+        }
         public void CopyValues<T>(T target, T source)
         {
             if (target == null || source == null)

@@ -23,7 +23,7 @@ namespace Homee.API.AppStart
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<ISubscriptionService, SubscriptionService>();
-
+            services.AddScoped<IMailService, MailService>();
 
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();

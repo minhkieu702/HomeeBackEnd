@@ -1,6 +1,7 @@
 ﻿using Homee.BusinessLayer.Commons;
 using Homee.DataLayer.Models;
 using Homee.DataLayer.RequestModels;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,5 +18,6 @@ namespace Homee.BusinessLayer.IServices
         Task<IHomeeResult> Block(int id);
         Task<IHomeeResult> Create(AccountRequest model);
         Task<IHomeeResult> Login(string email, string password);
+        Task<IHomeeResult> ConfirmEmail(string email, HttpContext context);
     }
 }
