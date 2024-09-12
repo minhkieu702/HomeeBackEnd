@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -12,17 +13,17 @@ namespace Homee.DataLayer.RequestModels
         public string Email { get; set; } = null!;
 
         public string Password { get; set; } = null!;
-
-        public string ImageUrl { get; set; } = null!;
-
-        public string Name { get; set; } = null!;
-
-        public string Phone { get; set; } = null!;
-
-        public string CitizenId { get; set; } = null!;
+        [AllowNull]
+        public string? ImageUrl { get; set; } = null!;
         
-        public int Role { get; set; }
-
+        public string Name { get; set; } = null!;
+        
+        public string Phone { get; set; } = null!;
+        [AllowNull]
+        public string? CitizenId { get; set; } = null!;
+        [AllowNull]
+        public int? Role { get; set; }
+        [AllowNull]
         public DateTime? BirthDay { get; set; }
 
     }

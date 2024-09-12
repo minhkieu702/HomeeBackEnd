@@ -72,17 +72,33 @@ namespace Homee.BusinessLayer.Helpers
                 }
             }
         }
-
-        public object GetValueFromSession(string key, HttpContext context)
+        public static bool GetValueFromSession<T>(string key, out T value, HttpContext context)
         {
+            value = JsonConvert.DeserializeObject<T>("");
             context.Session.TryGetValue(key, out byte[] o);
-            return JsonConvert.DeserializeObject(Encoding.UTF8.GetString(o));
+            if (o == null)
+            {
+                return false;
+            }
+            value = JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(o));
+            return true;
         }
 
-        public void SetValueToSession(string key, object value, HttpContext context)
+        public static void SetValueToSession(string key, object value, HttpContext context)
         {
             context.Session.Set(key, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value)));
         }
+
+        //public object GetValueFromSession(string key, HttpContext context)
+        //{
+        //    context.Session.TryGetValue(key, out byte[] o);
+        //    return JsonConvert.DeserializeObject(Encoding.UTF8.GetString(o));
+        //}
+
+        //public void SetValueToSession(string key, object value, HttpContext context)
+        //{
+        //    context.Session.Set(key, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value)));
+        //}
 
         public bool TryParseJsonArrayGrades(string jsonString, out List<double> values)
         {

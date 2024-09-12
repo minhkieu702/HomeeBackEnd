@@ -31,7 +31,7 @@ namespace Homee.BusinessLayer.Services
                 bool result = await _repo.CanInsert(model);
                 if (result)
                 {
-                    return new HomeeResult(Const.FAIL_CREATE_CODE, "This address is already registered.");
+                    return new HomeeResult(Const.FAIL_CREATE_CODE, "This subscription is already existed.");
                 }
                 await _repo.InsertAsync(_mapper.Map<Subscription>(model));
                 var check = await _repo.SaveChangesAsync();

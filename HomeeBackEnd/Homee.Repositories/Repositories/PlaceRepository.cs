@@ -82,11 +82,10 @@ namespace Homee.Repositories.Repositories
         {
             try
             {
-                var user = SupportingFeature.Instance.GetValueFromSession("user", httpContext);
                 var userid = 1;
-                if (user != null)
+                if (!SupportingFeature.GetValueFromSession("user", out Account user, httpContext) && user != null)
                 {
-                    userid = int.Parse(user.ToString());
+                    userid = int.Parse(user.AccountId.ToString());
                 }
                 return userid;
             }
