@@ -45,5 +45,22 @@ namespace Homee.API.Controllers
         }
         [HttpPost("Register")]
         public IActionResult Register(AccountRequest account) => Ok(_service.Register(account, HttpContext).Result);
+        [HttpPost("ResetPassword")]
+        public IActionResult ResetPassword(string password) => Ok(_service.ResetPassword(password, HttpContext).Result);
+        [HttpPost("Login")]
+        public IActionResult Login(string email, string password) => Ok(_service.Login(email, password, HttpContext).Result);
+        [HttpPost]
+        public IActionResult Logout()
+        {
+            try
+            {
+                HttpContext.Session.Clear();
+                return Ok(new HomeeResult(Const.SUCCESS_UPDATE_CODE, "Logout successfully."));
+            }
+            catch (Exception ex)
+            {
+                return Ok(new HomeeResult(Const.ERROR_EXCEPTION, ex.Message));
+            }
+        }
     }
 }

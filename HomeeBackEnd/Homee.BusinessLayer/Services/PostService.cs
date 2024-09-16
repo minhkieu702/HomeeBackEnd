@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Homee.BusinessLayer.Commons;
 using Homee.BusinessLayer.IServices;
+using Homee.DataLayer.Models;
 using Homee.DataLayer.RequestModels;
+using Homee.DataLayer.ResponseModels;
 using Homee.Repositories.IRepositories;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -22,19 +24,54 @@ namespace Homee.BusinessLayer.Services
             _mapper = mapper;
             _repo = postRepository;
         }
-        public Task<IHomeeResult> Create(PostRequest model)
+        public async Task<IHomeeResult> Create(PostRequest model)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = _mapper.Map<Post>(model);
+                result.IsBlock = false;
+                await _repo.InsertAsync(result);
+                var check = await _repo.SaveChangesAsync();
+                return check >= 0 ? new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG) : new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
         }
 
-        public Task<IHomeeResult> Delete(int id)
+        public async Task<IHomeeResult> Delete(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await _repo.GetById(id);
+                if (result == null)
+                {
+                    return new HomeeResult(Const.FAIL_DELETE_CODE, Const.FAIL_DELETE_MSG);
+                }
+                int check = await _repo.DeletePost(id);
+                return check >= 0 ? new HomeeResult(Const.SUCCESS_DELETE_CODE, Const.SUCCESS_DELETE_MSG) : new HomeeResult(Const.FAIL_DELETE_CODE, Const.FAIL_DELETE_MSG);
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
         }
 
-        public Task<IHomeeResult> GetAll()
+        public async Task<IHomeeResult> GetAll()
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await _repo.GetPosts();
+                if (result == null || result.Count() <= 0)
+                    return new HomeeResult(Const.FAIL_READ_CODE, Const.FAIL_READ_MSG);
+                var posts = result.ToList().Select(_mapper.Map<PostResponse>);
+                return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, posts);
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
         }
 
         public Task<IHomeeResult> GetByCurrentUser(HttpContext context)
@@ -42,9 +79,20 @@ namespace Homee.BusinessLayer.Services
             throw new NotImplementedException();
         }
 
-        public Task<IHomeeResult> GetById(int id)
+        public async Task<IHomeeResult> GetById(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await _repo.GetPostById(id);
+                if (result == null)
+                    return new HomeeResult(Const.FAIL_READ_CODE, Const.FAIL_READ_MSG);
+                var posts = _mapper.Map<PostResponse>(result);
+                return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, posts);
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
         }
 
         public Task<IHomeeResult> Update(int id, PostRequest model)

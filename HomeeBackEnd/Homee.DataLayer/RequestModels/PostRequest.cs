@@ -17,7 +17,6 @@ namespace Homee.DataLayer.RequestModels
 
         public int Status { get; set; }
 
-        public bool IsBlock { get; set; }
         public List<string> ImageUrls { get; set; } = [];
     }
 }

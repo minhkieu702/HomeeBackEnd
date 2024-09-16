@@ -17,9 +17,10 @@ namespace Homee.BusinessLayer.IServices
         Task<IHomeeResult> Update(int id, AccountRequest model);
         Task<IHomeeResult> Block(int id);
         Task<IHomeeResult> Create(AccountRequest model);
-        Task<IHomeeResult> Login(string email, string password);
+        Task<IHomeeResult> Login(string email, string password, HttpContext context);
         Task<IHomeeResult> ConfirmEmaiToRegister(string email, HttpContext context);
         Task<IHomeeResult> ConfirmEmaiToGetNewPassword(string email, HttpContext context);
         Task<IHomeeResult> Register(AccountRequest model, HttpContext context);
+        Task<IHomeeResult> ResetPassword(string password, HttpContext context);
     }
 }

@@ -9,6 +9,7 @@ using Homee.Repositories.IRepositories;
 using Homee.Repositories.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Identity.Client;
+using Microsoft.IdentityModel.Tokens;
 using System.Security.Principal;
 
 namespace Homee.BusinessLayer.Services
@@ -139,6 +140,34 @@ namespace Homee.BusinessLayer.Services
                 return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
             }
         }
+        public async Task<IHomeeResult> ResetPassword(string password, HttpContext context)
+        {
+            try
+            {
+                if(!SupportingFeature.GetValueFromSession("email", out string email, context) || email.IsNullOrEmpty())
+                {
+                    return new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
+                }
+                var account = _repo.GetAccounts().FirstOrDefault(c => c.Email.Equals(email));
+                if (account == null)
+                {
+                    return new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
+                }
+                account.Password= password;
+                _repo.Update(account);
+                var check = await _repo.SaveChangesAsync();
+                if (check <= 0)
+                {
+                    return new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);
+                }
+                return new HomeeResult(Const.SUCCESS_UPDATE_CODE, Const.SUCCESS_UPDATE_MSG);
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
+        }
+
         public async Task<IHomeeResult> Register(AccountRequest model, HttpContext context)
         {
             try
@@ -180,7 +209,7 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
-        public async Task<IHomeeResult> Login(string email, string password)
+        public async Task<IHomeeResult> Login(string email, string password, HttpContext context)
         {
             try
             {
@@ -190,7 +219,7 @@ namespace Homee.BusinessLayer.Services
                     return new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
                 }
                 var account = result.FirstOrDefault(c => c.Email.Equals(email) && c.Password.Equals(password));
-                
+                SupportingFeature.SetValueToSession("user", account, context);
                 return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, _mapper.Map<AccountResponse>(result));
             }
             catch (Exception ex)

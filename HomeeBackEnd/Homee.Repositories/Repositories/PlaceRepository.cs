@@ -43,7 +43,7 @@ namespace Homee.Repositories.Repositories
                 .Include(p => p.CategoryPlaces).ThenInclude(c => c.Category)
                 .Include(p => p.Interiors)
                 .Include(p => p.Posts).ThenInclude(c => c.Images)
-                .Include(p => p.Owner).IgnoreAutoIncludes()
+                .Include(p => p.Owner)
                 .ToList();
             //foreach (var place in places)
             //{
