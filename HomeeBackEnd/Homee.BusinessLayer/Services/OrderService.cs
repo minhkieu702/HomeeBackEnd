@@ -25,21 +25,19 @@ namespace Homee.BusinessLayer.Services
             _mappper = mapper;
             _repo = orderRepository;
         }
-        public async Task<IHomeeResult> Create(OrderRequest model)
+        public async Task<IHomeeResult> Create(int subId, HttpContext httpContext)
         {
             try
             {
-                //bool result = await _repo.CanInsert(model);
-                //if (!result)
-                //{
-                //    return new HomeeResult(Const.FAIL_CREATE_CODE, "This address is already registered.");
-                //}
-                //await _repo.InsertPlace(_mapper.Map<Place>(model));
-                _repo.Insert(_mappper.Map<Order>(model));
-                var check = await _repo.SaveChangesAsync();
-                return check <= 0 ?
+                bool result = await _repo.CanInsert(subId);
+                if (!result)
+                {
+                    return new HomeeResult(Const.FAIL_CREATE_CODE, "This address is already registered.");
+                }
+                string check = await _repo.CreateOrderTemp(subId, httpContext);
+                return check == null || check.Length <= 0 ?
                     new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG) :
-                    new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG);
+                    new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG, check);
             }
             catch (Exception ex)
             {
@@ -58,6 +56,28 @@ namespace Homee.BusinessLayer.Services
                 var check = await _repo.SaveChangesAsync();
 
                 return check <= 0 ? new HomeeResult(Const.FAIL_DELETE_CODE, Const.FAIL_DELETE_MSG) : new HomeeResult(Const.SUCCESS_DELETE_CODE, Const.SUCCESS_DELETE_MSG);
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
+        }
+        
+        public async Task<IHomeeResult> ExecutePayment(ReturnUrlRequest payment)
+        {
+            try
+            {
+                if (payment.Cancel)
+                {
+                    var result = await Delete((int)payment.OrderCode);
+                    return result.Status == 1 ? new HomeeResult(Const.FAIL_CREATE_CODE, "Đã hủy thanh toán") : result;
+                }
+                if (payment.Status != "PAID")
+                {
+                    var result = await Delete((int)payment.OrderCode);
+                    return result.Status == 1 ? new HomeeResult(Const.FAIL_CREATE_CODE, "Đã hủy thanh toán") : result;
+                }
+                return new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG);
             }
             catch (Exception ex)
             {
