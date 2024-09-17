@@ -23,17 +23,11 @@ public partial class HomeeDbContext : DbContext
 
     public virtual DbSet<Contract> Contracts { get; set; }
 
-    public virtual DbSet<Conversation> Conversations { get; set; }
-
-    public virtual DbSet<ConversationParticipant> ConversationParticipants { get; set; }
-
     public virtual DbSet<FavoritePost> FavoritePosts { get; set; }
 
     public virtual DbSet<Image> Images { get; set; }
 
     public virtual DbSet<Interior> Interiors { get; set; }
-
-    public virtual DbSet<Message> Messages { get; set; }
 
     public virtual DbSet<Notification> Notifications { get; set; }
 
@@ -114,32 +108,6 @@ public partial class HomeeDbContext : DbContext
                 .HasConstraintName("FK_Contract_Render");
         });
 
-        modelBuilder.Entity<Conversation>(entity =>
-        {
-            entity.HasKey(e => e.ConversationId).HasName("PK__Conversa__C050D877C4C5549B");
-
-            entity.ToTable("Conversation");
-
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
-        });
-
-        modelBuilder.Entity<ConversationParticipant>(entity =>
-        {
-            entity.HasKey(e => e.ConversationParticipantId).HasName("PK__Conversa__995721BA94580236");
-
-            entity.ToTable("ConversationParticipant");
-
-            entity.HasOne(d => d.Account).WithMany(p => p.ConversationParticipants)
-                .HasForeignKey(d => d.AccountId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_ConversationParticipant_Account");
-
-            entity.HasOne(d => d.Conversation).WithMany(p => p.ConversationParticipants)
-                .HasForeignKey(d => d.ConversationId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_ConversationParticipant_Conversation");
-        });
-
         modelBuilder.Entity<FavoritePost>(entity =>
         {
             entity.HasKey(e => new { e.AccountId, e.PostId }).HasName("PK__Favorite__AE3C83A73BA6835F");
@@ -185,25 +153,6 @@ public partial class HomeeDbContext : DbContext
                 .HasForeignKey(d => d.PlaceId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Interior_Place");
-        });
-
-        modelBuilder.Entity<Message>(entity =>
-        {
-            entity.HasKey(e => e.MessageId).HasName("PK__Message__C87C0C9CBA8228BE");
-
-            entity.ToTable("Message");
-
-            entity.Property(e => e.Timestamp).HasColumnType("datetime");
-
-            entity.HasOne(d => d.Conversation).WithMany(p => p.Messages)
-                .HasForeignKey(d => d.ConversationId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Message_Conversation");
-
-            entity.HasOne(d => d.Sender).WithMany(p => p.Messages)
-                .HasForeignKey(d => d.SenderId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Message_Sender");
         });
 
         modelBuilder.Entity<Notification>(entity =>

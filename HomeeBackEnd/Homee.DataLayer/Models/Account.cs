@@ -35,11 +35,7 @@ public partial class Account
 
     public virtual ICollection<Contract> Contracts { get; set; } = new List<Contract>();
 
-    public virtual ICollection<ConversationParticipant> ConversationParticipants { get; set; } = new List<ConversationParticipant>();
-
     public virtual ICollection<FavoritePost> FavoritePosts { get; set; } = new List<FavoritePost>();
-
-    public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
 
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 

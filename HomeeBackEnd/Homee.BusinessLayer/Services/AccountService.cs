@@ -219,8 +219,9 @@ namespace Homee.BusinessLayer.Services
                     return new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
                 }
                 var account = result.FirstOrDefault(c => c.Email.Equals(email) && c.Password.Equals(password));
+                if(account == null) return new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
                 SupportingFeature.SetValueToSession("user", account, context);
-                return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, _mapper.Map<AccountResponse>(result));
+                return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, _mapper.Map<AccountResponse>(account));
             }
             catch (Exception ex)
             {

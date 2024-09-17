@@ -49,7 +49,7 @@ namespace Homee.API.Controllers
         public IActionResult ResetPassword(string password) => Ok(_service.ResetPassword(password, HttpContext).Result);
         [HttpPost("Login")]
         public IActionResult Login(string email, string password) => Ok(_service.Login(email, password, HttpContext).Result);
-        [HttpPost]
+        [HttpPost("Logout")]
         public IActionResult Logout()
         {
             try
