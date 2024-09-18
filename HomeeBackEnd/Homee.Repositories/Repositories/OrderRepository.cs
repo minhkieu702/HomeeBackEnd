@@ -99,7 +99,7 @@ namespace Homee.Repositories.Repositories
 
                 SupportingFeature.SetValueToSession("orderId", order.OrderId, httpContext);
 
-                var paymentData = new PaymentData(order.OrderId, item.price, "Dang ky goi "+subscription.SubscriptionName, items, _config["LocalHostUrl"], _config["LocalHostUrl"]);
+                var paymentData = new PaymentData(order.OrderId, item.price, "Gói "+subscription.SubscriptionName, items, _config["LocalHostUrl"], _config["LocalHostUrl"]);
 
                 CreatePaymentResult createPayment = await payOS.createPaymentLink(paymentData);
                 
