@@ -20,8 +20,10 @@ namespace Homee.API.Controllers
         }
         [HttpGet("GetOTPToRegister/{email}")]
         public IActionResult Get(string email) => Ok(_service.ConfirmEmaiToRegister(email, HttpContext).Result);
+        
         [HttpGet("GetOTPToUpdatePassword/{email}")]
         public IActionResult GetOTPToUpdatePassword(string email) => Ok(_service.ConfirmEmaiToGetNewPassword(email, HttpContext).Result);
+        
         [HttpPost("ConfirmOTP")]
         public IActionResult ConfirmOTP(string OTP)
         {
@@ -43,12 +45,16 @@ namespace Homee.API.Controllers
                 return Ok(new HomeeResult(Const.ERROR_EXCEPTION, "Something was wrong."));
             }
         }
+        
         [HttpPost("Register")]
         public IActionResult Register(AccountRequest account) => Ok(_service.Register(account, HttpContext).Result);
+        
         [HttpPost("ResetPassword")]
         public IActionResult ResetPassword(string password) => Ok(_service.ResetPassword(password, HttpContext).Result);
+        
         [HttpPost("Login")]
         public IActionResult Login(string email, string password) => Ok(_service.Login(email, password, HttpContext).Result);
+        
         [HttpPost("Logout")]
         public IActionResult Logout()
         {
