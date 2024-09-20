@@ -191,6 +191,10 @@ public partial class HomeedbContext : DbContext
             entity.ToTable("Order");
 
             entity.Property(e => e.ExpiredAt).HasColumnType("datetime");
+            entity.Property(e => e.PaymentId)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("paymentId");
             entity.Property(e => e.SubscribedAt).HasColumnType("datetime");
 
             entity.HasOne(d => d.Owner).WithMany(p => p.Orders)

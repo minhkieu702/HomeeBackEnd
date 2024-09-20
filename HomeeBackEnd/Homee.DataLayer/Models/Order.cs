@@ -15,6 +15,8 @@ public partial class Order
 
     public DateTime SubscribedAt { get; set; }
 
+    public string? PaymentId { get; set; }
+
     public virtual Account Owner { get; set; } = null!;
 
     public virtual Subscription Subscription { get; set; } = null!;

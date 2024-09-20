@@ -29,12 +29,10 @@ namespace Homee.API.AppStart
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IPlaceRepository, PlaceRepository>();
             services.AddScoped<IContractRepository, ContractRepository>();
-            services.AddScoped<IConversationRepository, ConversationRepository>();
             services.AddScoped<IFavoritePostRepository, FavoritePostRepository>();
             services.AddScoped<IImageRepository, ImageRepository>();
             services.AddScoped<IInteriorRepository, InteriorRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
-            services.AddScoped<IMessageRepository, MessageRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IPostRepository, PostRepository>();
             services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
