@@ -15,13 +15,13 @@ namespace Homee.Repositories.Repositories
 {
     public class PlaceRepository : BaseRepository<Place>, IPlaceRepository
     {
-        private readonly HomeeDbContext _context;
+        private readonly HomeedbContext _context;
 
         public PlaceRepository()
         {
 
         }
-        public PlaceRepository(HomeeDbContext context)
+        public PlaceRepository(HomeedbContext context)
         {
             _context = context;
         }

@@ -5,13 +5,13 @@ using Microsoft.Extensions.Configuration;
 
 namespace Homee.DataLayer.Models;
 
-public partial class HomeeDbContext : DbContext
+public partial class HomeedbContext : DbContext
 {
-    public HomeeDbContext()
+    public HomeedbContext()
     {
     }
 
-    public HomeeDbContext(DbContextOptions<HomeeDbContext> options)
+    public HomeedbContext(DbContextOptions<HomeedbContext> options)
         : base(options)
     {
     }
@@ -61,7 +61,7 @@ public partial class HomeeDbContext : DbContext
     {
         modelBuilder.Entity<Account>(entity =>
         {
-            entity.HasKey(e => e.AccountId).HasName("PK__Account__349DA5A66C94E600");
+            entity.HasKey(e => e.AccountId).HasName("PK__Account__349DA5A6CBA7BC63");
 
             entity.ToTable("Account");
 
@@ -79,7 +79,7 @@ public partial class HomeeDbContext : DbContext
 
         modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(e => e.CategoryId).HasName("PK__Category__19093A0B27048D67");
+            entity.HasKey(e => e.CategoryId).HasName("PK__Category__19093A0B8D99E1F3");
 
             entity.ToTable("Category");
 
@@ -88,7 +88,7 @@ public partial class HomeeDbContext : DbContext
 
         modelBuilder.Entity<CategoryPlace>(entity =>
         {
-            entity.HasKey(e => e.CategoryPlaceId).HasName("PK__Category__C882A4EB63A14055");
+            entity.HasKey(e => e.CategoryPlaceId).HasName("PK__Category__C882A4EB99D5600E");
 
             entity.ToTable("CategoryPlace");
 
@@ -105,7 +105,7 @@ public partial class HomeeDbContext : DbContext
 
         modelBuilder.Entity<Contract>(entity =>
         {
-            entity.HasKey(e => e.ContractId).HasName("PK__Contract__C90D34697FCB1B7B");
+            entity.HasKey(e => e.ContractId).HasName("PK__Contract__C90D3469C5738CE8");
 
             entity.ToTable("Contract");
 
@@ -124,7 +124,7 @@ public partial class HomeeDbContext : DbContext
 
         modelBuilder.Entity<FavoritePost>(entity =>
         {
-            entity.HasKey(e => new { e.AccountId, e.PostId }).HasName("PK__Favorite__AE3C83A73BA6835F");
+            entity.HasKey(e => new { e.AccountId, e.PostId }).HasName("PK__Favorite__AE3C83A72EBB023E");
 
             entity.ToTable("FavoritePost");
 
@@ -143,7 +143,7 @@ public partial class HomeeDbContext : DbContext
 
         modelBuilder.Entity<Image>(entity =>
         {
-            entity.HasKey(e => e.ImageId).HasName("PK__Image__7516F70C0AA6B91A");
+            entity.HasKey(e => e.ImageId).HasName("PK__Image__7516F70C67857F52");
 
             entity.ToTable("Image");
 
@@ -157,7 +157,7 @@ public partial class HomeeDbContext : DbContext
 
         modelBuilder.Entity<Interior>(entity =>
         {
-            entity.HasKey(e => e.InteriorId).HasName("PK__Interior__5812A9B2A27D7244");
+            entity.HasKey(e => e.InteriorId).HasName("PK__Interior__5812A9B2D4EEC15D");
 
             entity.ToTable("Interior");
 
@@ -171,7 +171,7 @@ public partial class HomeeDbContext : DbContext
 
         modelBuilder.Entity<Notification>(entity =>
         {
-            entity.HasKey(e => e.NotificationId).HasName("PK__Notifica__20CF2E126ED71A43");
+            entity.HasKey(e => e.NotificationId).HasName("PK__Notifica__20CF2E123DFEE9ED");
 
             entity.ToTable("Notification");
 
@@ -186,7 +186,7 @@ public partial class HomeeDbContext : DbContext
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrderId).HasName("PK__Order__C3905BCF680553C2");
+            entity.HasKey(e => e.OrderId).HasName("PK__Order__C3905BCF5B4B450D");
 
             entity.ToTable("Order");
 
@@ -206,7 +206,7 @@ public partial class HomeeDbContext : DbContext
 
         modelBuilder.Entity<Place>(entity =>
         {
-            entity.HasKey(e => e.PlaceId).HasName("PK__Place__D5222B6E7D8EBB62");
+            entity.HasKey(e => e.PlaceId).HasName("PK__Place__D5222B6EE2245CCC");
 
             entity.ToTable("Place");
 
@@ -224,7 +224,7 @@ public partial class HomeeDbContext : DbContext
 
         modelBuilder.Entity<Post>(entity =>
         {
-            entity.HasKey(e => e.PostId).HasName("PK__Post__AA1260188DA3DB1C");
+            entity.HasKey(e => e.PostId).HasName("PK__Post__AA12601842D5C110");
 
             entity.ToTable("Post");
 
@@ -238,7 +238,7 @@ public partial class HomeeDbContext : DbContext
 
         modelBuilder.Entity<Subscription>(entity =>
         {
-            entity.HasKey(e => e.SubscriptionId).HasName("PK__Subscrip__9A2B249D2CA58F9C");
+            entity.HasKey(e => e.SubscriptionId).HasName("PK__Subscrip__9A2B249DCF1AAF82");
 
             entity.ToTable("Subscription");
 

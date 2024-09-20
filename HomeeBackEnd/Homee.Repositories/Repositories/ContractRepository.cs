@@ -7,10 +7,10 @@ namespace Homee.Repositories.Repositories
 {
     public class ContractRepository : BaseRepository<Contract>, IContractRepository
     {
-        private readonly HomeeDbContext _context;
+        private readonly HomeedbContext _context;
 
         public ContractRepository() { }
-        public ContractRepository(HomeeDbContext context)
+        public ContractRepository(HomeedbContext context)
         {
             _context = context;
         }

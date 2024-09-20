@@ -12,10 +12,10 @@ namespace Homee.Repositories.Repositories
 {
     public class AccountRepository : BaseRepository<Account>, IAccountRepository
     {
-        private readonly HomeeDbContext _context;
+        private readonly HomeedbContext _context;
 
         public AccountRepository() { }
-        public AccountRepository(HomeeDbContext context)
+        public AccountRepository(HomeedbContext context)
         {
             _context = context;
         }

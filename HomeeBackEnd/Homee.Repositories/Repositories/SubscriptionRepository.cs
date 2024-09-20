@@ -13,9 +13,9 @@ namespace Homee.Repositories.Repositories
 {
     public class SubscriptionRepository : BaseRepository<Subscription>, ISubscriptionRepository
     {
-        private readonly HomeeDbContext _context;
+        private readonly HomeedbContext _context;
 
-        public SubscriptionRepository(HomeeDbContext context)
+        public SubscriptionRepository(HomeedbContext context)
         {
             _context = context;
         }

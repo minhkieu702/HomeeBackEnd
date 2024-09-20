@@ -502,7 +502,7 @@ namespace Homee.Repositories.Repositories
             }
         }
 
-        public HomeeDbContext GetDBContext()
+        public HomeedbContext GetDBContext()
         {
             return BaseDAO<TEntity>.Instance.GetDBContext();
         }

@@ -11,11 +11,11 @@ namespace Homee.Repositories.Repositories
 {
     public class PostRepository : BaseRepository<Post>, IPostRepository
     {
-        private readonly HomeeDbContext _context;
+        private readonly HomeedbContext _context;
 
         public PostRepository(){}
 
-        public PostRepository(HomeeDbContext context)
+        public PostRepository(HomeedbContext context)
         {
             _context = context;
         }

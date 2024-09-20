@@ -18,13 +18,13 @@ namespace Homee.Repositories.Repositories
     public class OrderRepository : BaseRepository<Order>, IOrderRepository
     {
         private readonly IConfiguration _config;
-        private readonly HomeeDbContext _context;
+        private readonly HomeedbContext _context;
 
         public OrderRepository()
         {
             
         }
-        public OrderRepository(HomeeDbContext context, IConfiguration configuration)
+        public OrderRepository(HomeedbContext context, IConfiguration configuration)
         {
             _config = configuration;
             _context = context;

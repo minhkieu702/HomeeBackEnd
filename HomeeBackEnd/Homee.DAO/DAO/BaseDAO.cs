@@ -15,7 +15,7 @@ namespace Homee.DAO.DAO
         private static BaseDAO<TEntity> instance = null;
         private static readonly object InstanceClock = new object();
 
-        private readonly HomeeDbContext _context;
+        private readonly HomeedbContext _context;
         private DbSet<TEntity> Table { get; set; }
 
         public static BaseDAO<TEntity> Instance
@@ -26,7 +26,7 @@ namespace Homee.DAO.DAO
                 {
                     if (instance == null)
                     {
-                        HomeeDbContext context = new();
+                        HomeedbContext context = new();
                         instance = new BaseDAO<TEntity>(context);
                     }
                     return instance;
@@ -34,13 +34,13 @@ namespace Homee.DAO.DAO
             }
         }
 
-        public BaseDAO(HomeeDbContext context)
+        public BaseDAO(HomeedbContext context)
         {
             _context = context;
             Table = context.Set<TEntity>();
         }
 
-        public HomeeDbContext GetDBContext() => _context;
+        public HomeedbContext GetDBContext() => _context;
 
         public virtual bool Any(Func<TEntity, bool> predicate)
         {

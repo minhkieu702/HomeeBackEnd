@@ -11,15 +11,15 @@ namespace Homee.Repositories.Repositories
 {
     public class InteriorRepository : BaseRepository<Interior>, IInteriorRepository
     {
-        private readonly HomeeDbContext _context;
+        private readonly HomeedbContext _context;
 
         public InteriorRepository()
         {
                 
         }
-        public InteriorRepository(HomeeDbContext homeeDbContext)
+        public InteriorRepository(HomeedbContext HomeedbContext)
         {
-            _context = homeeDbContext;
+            _context = HomeedbContext;
         }
         public IEnumerable<Interior> GetByPlace(int id)
         {

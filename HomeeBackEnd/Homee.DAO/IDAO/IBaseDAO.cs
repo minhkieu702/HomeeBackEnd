@@ -11,7 +11,7 @@ namespace Homee.DAO.IDAO
 {
     public interface IBaseDAO<TEntity> where TEntity : class
     {
-        public HomeeDbContext GetDBContext();
+        public HomeedbContext GetDBContext();
         public TEntity Find(Func<TEntity, bool> predicate);
         public IQueryable<TEntity> FindAll(Func<TEntity, bool> predicate);
         public Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> predicate);

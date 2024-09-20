@@ -11,14 +11,14 @@ namespace Homee.Repositories.Repositories
 {
     public class CategoryRepository : BaseRepository<Category>, ICategoryRepository
     {
-        private readonly HomeeDbContext _context;
+        private readonly HomeedbContext _context;
         public CategoryRepository()
         {
             
         }
-        public CategoryRepository(HomeeDbContext homeeDbContext)
+        public CategoryRepository(HomeedbContext HomeedbContext)
         {
-            _context = homeeDbContext;
+            _context = HomeedbContext;
         }
         //public int CanUpdate (int id, string name, out Category cate)
         //{
