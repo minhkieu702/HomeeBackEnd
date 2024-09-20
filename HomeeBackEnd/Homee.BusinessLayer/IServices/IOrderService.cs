@@ -14,8 +14,8 @@ namespace Homee.BusinessLayer.IServices
         Task<IHomeeResult> GetAll();
         Task<IHomeeResult> GetById(int id);
         Task<IHomeeResult> Update(int id, OrderRequest model);
-        Task<IHomeeResult>Create(int model, HttpContext httpContext);
+        Task<IHomeeResult>Create(int model);
         Task<IHomeeResult> Delete(int id);
-        Task<IHomeeResult> ExecutePayment(ReturnUrlRequest result);
+        Task<IHomeeResult> ExecutePayment(ReturnUrlRequest result, HttpContext httpContext);
     }
 }

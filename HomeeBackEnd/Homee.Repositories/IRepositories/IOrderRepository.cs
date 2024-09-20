@@ -11,10 +11,11 @@ namespace Homee.Repositories.IRepositories
 {
     public interface IOrderRepository : IBaseRepository<Order>
     {
-        Task<bool> CanInsert(int model);
+        Task<int> CanInsert(ReturnUrlRequest model);
         List<Order> GetAllOrders();
         Order GetOrder(int id);
-        Task<string> CreateOrderTemp(int subId, HttpContext httpContext);
+        Task<string> CreatePaymentUrl(int subId);
         Task<int> UpdatePlace(Order result, OrderRequest model);
+        Task<int> InsertOrder(ReturnUrlRequest result, HttpContext httpContext);
     }
 }

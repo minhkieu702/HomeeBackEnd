@@ -25,16 +25,16 @@ namespace Homee.BusinessLayer.Services
             _mappper = mapper;
             _repo = orderRepository;
         }
-        public async Task<IHomeeResult> Create(int subId, HttpContext httpContext)
+        public async Task<IHomeeResult> Create(int subId)
         {
             try
             {
-                bool result = await _repo.CanInsert(subId);
-                if (!result)
-                {
-                    return new HomeeResult(Const.FAIL_CREATE_CODE, "This address is already registered.");
-                }
-                string check = await _repo.CreateOrderTemp(subId, httpContext);
+                //bool result = await _repo.CanInsert(subId);
+                //if (!result)
+                //{
+                //    return new HomeeResult(Const.FAIL_CREATE_CODE, "This address is already registered.");
+                //}
+                string check = await _repo.CreatePaymentUrl(subId);
                 return check == null || check.Length <= 0 ?
                     new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG) :
                     new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG, check);
@@ -63,21 +63,15 @@ namespace Homee.BusinessLayer.Services
             }
         }
         
-        public async Task<IHomeeResult> ExecutePayment(ReturnUrlRequest payment)
+        public async Task<IHomeeResult> ExecutePayment(ReturnUrlRequest payment, HttpContext httpContext)
         {
             try
             {
-                if (payment.Cancel)
-                {
-                    var result = await Delete((int)payment.OrderCode);
-                    return result.Status == 1 ? new HomeeResult(Const.FAIL_CREATE_CODE, "Đã hủy thanh toán") : result;
-                }
-                if (payment.Status != "PAID")
-                {
-                    var result = await Delete((int)payment.OrderCode);
-                    return result.Status == 1 ? new HomeeResult(Const.FAIL_CREATE_CODE, "Đã hủy thanh toán") : result;
-                }
-                return new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG);
+                var result = await _repo.CanInsert(payment);
+                if (result == -1) return new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
+                if (result == 0) return new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG);
+                var check = await _repo.InsertOrder(payment, httpContext);
+                return check > 0 ? new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG) : new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
             }
             catch (Exception ex)
             {

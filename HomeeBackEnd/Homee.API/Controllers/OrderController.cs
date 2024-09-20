@@ -4,8 +4,13 @@ using Homee.BusinessLayer.IServices;
 using Homee.DataLayer.RequestModels;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Net.payOS;
 using Net.payOS.Types;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace Homee.API.Controllers
 
@@ -25,7 +30,7 @@ namespace Homee.API.Controllers
         }
 
         [HttpPost("Create")]
-        public IActionResult Create([FromBody] int subscriptionId) => Ok(_service.Create(subscriptionId, HttpContext).Result);
+        public IActionResult Create([FromBody] int subscriptionId) => Ok(_service.Create(subscriptionId).Result);
 
         [HttpGet("GetAll")]
         public IActionResult GetAll() => Ok(_service.GetAll().Result);
@@ -41,15 +46,16 @@ namespace Homee.API.Controllers
 
         //code=00&id=2e4acf1083304877bf1a8c108b30cccd&cancel=true&status=CANCELLED&orderCode=803347
         [HttpGet("return-url")]
-        public async Task<IActionResult> ExecutePayment()
+        public IActionResult ExecutePayment()
         {
             var result = new ReturnUrlRequest();
             result.Code = int.Parse(HttpContext.Request.Query["code"].ToString());
-            result.Id = HttpContext.Request.Query["id"].ToString();
+            result.SubId = int.Parse(HttpContext.Request.Query["ordercode"].ToString().Substring(0, 1));
             result.Cancel = bool.Parse(HttpContext.Request.Query["cancel"].ToString());
-            result.OrderCode = int.Parse(HttpContext.Request.Query["ordercode"].ToString());
+            result.PaymentId = HttpContext.Request.Query["id"].ToString();
             result.Status = HttpContext.Request.Query["status"].ToString();
-            return Ok(await _service.ExecutePayment(result));
+            
+            return Ok(_service.ExecutePayment(result, HttpContext).Result);
         }
     }
 }

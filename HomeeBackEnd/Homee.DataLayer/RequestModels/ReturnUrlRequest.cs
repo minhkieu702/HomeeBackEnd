@@ -9,8 +9,8 @@ namespace Homee.DataLayer.RequestModels
     public class ReturnUrlRequest
     {
         public int Code { get; set; }
-        public string Id { get; set; }
-        public long OrderCode { get; set; }
+        public int SubId { get; set; }
+        public string PaymentId { get; set; }
         public bool Cancel { get; set; }
         public string Status { get; set; }
     }

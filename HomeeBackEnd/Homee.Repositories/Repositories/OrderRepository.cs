@@ -58,12 +58,24 @@ namespace Homee.Repositories.Repositories
             return orders;
         }
 
-        public async Task<bool> CanInsert(int sId)
+        public async Task<int> CanInsert(ReturnUrlRequest request)
         {
-            return true;
+            try
+            {
+                if (request.Status != "PAID") return -1;
+
+                if (_context.Orders.FirstOrDefault(c => request.PaymentId.Equals(c.PaymentId)) != null) return 0;
+
+                return 1;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
-        public async Task<string> CreateOrderTemp(int subId, HttpContext httpContext)
+        public async Task<string> CreatePaymentUrl(int subId)
         {
             try
             {
@@ -74,36 +86,44 @@ namespace Homee.Repositories.Repositories
                 if (subscription == null) return null;
                 
                 var item = new ItemData(subscription.SubscriptionName, 1, (int)subscription.Price);
-
-                var accId = 1;
-                if (SupportingFeature.GetValueFromSession("user", out Account user, httpContext))
-                {
-                    accId = user.AccountId;
-                }
-
-                var expiredAt = DateTime.Now.AddDays((double)subscription.Duration);
-
-                var order = new Order
-                {
-                    SubscriptionId = subId,
-                    ExpiredAt = expiredAt,
-                    OwnerId = accId,
-                    SubscribedAt = DateTime.Now,
-                };
-
-                await _context.Orders.AddAsync(order);
-                
-                var check = await _context.SaveChangesAsync();
-                
+                                
                 List<ItemData> items = [item];
 
-                SupportingFeature.SetValueToSession("orderId", order.OrderId, httpContext);
-
-                var paymentData = new PaymentData(order.OrderId, item.price, "Gói "+subscription.SubscriptionName, items, _config["LocalHostUrl"], _config["LocalHostUrl"]);
+                var paymentData = new PaymentData(long.Parse(subId.ToString() + DateTime.Now.Ticks%100000), item.price, subscription.SubscriptionName, items, _config["LocalHostUrl"], _config["LocalHostUrl"]);
 
                 CreatePaymentResult createPayment = await payOS.createPaymentLink(paymentData);
                 
                 return createPayment.checkoutUrl;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public async Task<int> InsertOrder(ReturnUrlRequest payment, HttpContext httpContext)
+        {
+            try
+            {
+                var subscription = _context.Subscriptions.FirstOrDefault(c => c.SubscriptionId == payment.SubId);
+
+                if (subscription == null) return 0;
+                
+                var accId = 1;
+                if (SupportingFeature.GetValueFromSession("user", out Account user, httpContext)) accId = user.AccountId;
+
+                var order = new Order
+                {
+                    SubscriptionId = payment.SubId,
+                    SubscribedAt = DateTime.Now,
+                    ExpiredAt = DateTime.Now.AddDays((double)subscription.Duration),
+                    PaymentId = payment.PaymentId,
+                    OwnerId = accId
+                };
+
+                await _context.Orders.AddAsync(order);
+                return await _context.SaveChangesAsync();
             }
             catch (Exception)
             {
