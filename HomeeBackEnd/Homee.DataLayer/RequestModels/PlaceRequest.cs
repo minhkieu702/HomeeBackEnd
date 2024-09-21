@@ -30,8 +30,6 @@ namespace Homee.DataLayer.RequestModels
 
         public double Rent { get; set; }
 
-        public List<int> Categories { get; set; } = [];
-        
-        public List<InteriorRequest> Interiors { get; set; } = [];
+        public List<int> Categories { get; set; } = [];        
     }
 }

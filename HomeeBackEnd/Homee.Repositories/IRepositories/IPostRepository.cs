@@ -1,4 +1,5 @@
 ﻿using Homee.DataLayer.Models;
+using Homee.DataLayer.RequestModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,7 @@ namespace Homee.Repositories.IRepositories
         Task<int> DeletePost(int id);
         Task<IList<Post>> GetPosts();
         Task<Post> GetPostById(int id);
+        Task<int> InsertPlacePost(PlacePostRequest model);
+        Task<bool> CanInsert(PlacePostRequest model);
     }
 }
