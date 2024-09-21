@@ -30,11 +30,6 @@ namespace Homee.API.AppStart
             CreateMap<FavoritePost, FavoritePostResponse>().ReverseMap();
             #endregion
 
-            #region Interior
-            CreateMap<Interior, InteriorRequest>().ReverseMap();
-            CreateMap<Interior, InteriorResponse>().ReverseMap();
-            #endregion
-
             #region Notification
             CreateMap<Notification, NotificationRequest>().ReverseMap();
             CreateMap<Notification, NotificationResponse>().ReverseMap();

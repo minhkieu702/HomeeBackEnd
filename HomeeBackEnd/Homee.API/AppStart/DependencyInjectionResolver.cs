@@ -17,7 +17,6 @@ namespace Homee.API.AppStart
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IPlaceService, PlaceService>();
             services.AddScoped<IContractService, ContractService>();
-            services.AddScoped<IInteriorService, InteriorService>();
             services.AddScoped<IFavoritePostService, FavoritePostService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IOrderService, OrderService>();
@@ -31,7 +30,6 @@ namespace Homee.API.AppStart
             services.AddScoped<IContractRepository, ContractRepository>();
             services.AddScoped<IFavoritePostRepository, FavoritePostRepository>();
             services.AddScoped<IImageRepository, ImageRepository>();
-            services.AddScoped<IInteriorRepository, InteriorRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IPostRepository, PostRepository>();

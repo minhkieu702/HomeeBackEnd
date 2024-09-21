@@ -28,8 +28,6 @@ public partial class HomeedbContext : DbContext
 
     public virtual DbSet<Image> Images { get; set; }
 
-    public virtual DbSet<Interior> Interiors { get; set; }
-
     public virtual DbSet<Notification> Notifications { get; set; }
 
     public virtual DbSet<Order> Orders { get; set; }
@@ -153,20 +151,6 @@ public partial class HomeedbContext : DbContext
                 .HasForeignKey(d => d.PostId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Image_Post");
-        });
-
-        modelBuilder.Entity<Interior>(entity =>
-        {
-            entity.HasKey(e => e.InteriorId).HasName("PK__Interior__5812A9B2D4EEC15D");
-
-            entity.ToTable("Interior");
-
-            entity.Property(e => e.InteriorName).HasMaxLength(255);
-
-            entity.HasOne(d => d.Place).WithMany(p => p.Interiors)
-                .HasForeignKey(d => d.PlaceId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Interior_Place");
         });
 
         modelBuilder.Entity<Notification>(entity =>
