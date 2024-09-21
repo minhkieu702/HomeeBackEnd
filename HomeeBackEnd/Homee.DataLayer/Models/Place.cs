@@ -31,11 +31,11 @@ public partial class Place
 
     public bool IsBlock { get; set; }
 
+    public int? InteriorStatus { get; set; }
+
     public virtual ICollection<CategoryPlace> CategoryPlaces { get; set; } = new List<CategoryPlace>();
 
     public virtual ICollection<Contract> Contracts { get; set; } = new List<Contract>();
-
-    public virtual ICollection<Interior> Interiors { get; set; } = new List<Interior>();
 
     public virtual Account Owner { get; set; } = null!;
 

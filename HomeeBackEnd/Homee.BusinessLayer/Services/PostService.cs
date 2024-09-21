@@ -39,7 +39,23 @@ namespace Homee.BusinessLayer.Services
                 return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
             }
         }
-
+        public async Task<IHomeeResult> PublishPost(PlacePostRequest model)
+        {
+            try
+            {
+                var result = await _repo.CanInsert(model);
+                if (!result)
+                {
+                    return new HomeeResult(Const.FAIL_CREATE_CODE, "This address is already registered.");
+                }
+                var check = await _repo.InsertPlacePost(model);
+                return check >= 0 ? new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG) : new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
+        }
         public async Task<IHomeeResult> Delete(int id)
         {
             try
