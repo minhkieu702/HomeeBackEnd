@@ -41,7 +41,6 @@ namespace Homee.Repositories.Repositories
         {
             var places = _context.Places.AsNoTracking()
                 .Include(p => p.CategoryPlaces).ThenInclude(c => c.Category)
-                .Include(p => p.Interiors)
                 .Include(p => p.Posts).ThenInclude(c => c.Images)
                 .Include(p => p.Owner)
                 .ToList();
@@ -138,18 +137,6 @@ namespace Homee.Repositories.Repositories
                         }
                     }
 
-                    foreach (var interior in model.Interiors)
-                    {
-                        _context.Interiors.Add(new Interior
-                        {
-                            Description = interior.Description,
-                            InteriorName = interior.InteriorName,
-                            Status = interior.Status,
-                            PlaceId = place.PlaceId,
-                        });
-                        flag2 = true;
-
-                    }
 
                     if (flag1 || flag2)
                     {

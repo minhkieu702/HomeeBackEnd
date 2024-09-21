@@ -1,4 +1,5 @@
 ﻿using Homee.DataLayer.Models;
+using Homee.DataLayer.RequestModels;
 using Homee.Repositories.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -19,6 +20,12 @@ namespace Homee.Repositories.Repositories
         {
             _context = context;
         }
+
+        public Task<bool> CanInsert(PlacePostRequest model)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<int> DeletePost(int id)
         {
             var check = 0;
@@ -75,7 +82,6 @@ namespace Homee.Repositories.Repositories
         public async Task<Post> GetPostById(int id)
         {
             var post = await _context.Posts.Include(c => c.Images)
-                .Include(c => c.Place).ThenInclude(c => c.Interiors)
                 .Include(c => c.Place).ThenInclude(c => c.Owner)
                 .Include(c => c.Place).ThenInclude(c => c.CategoryPlaces)
                 .AsNoTracking()
@@ -86,11 +92,15 @@ namespace Homee.Repositories.Repositories
         public async Task<IList<Post>> GetPosts()
         {
             var posts = await _context.Posts.Include(c => c.Images)
-                .Include(c => c.Place).ThenInclude(c => c.Interiors)
                 .Include(c => c.Place).ThenInclude(c => c.Owner)
                 .Include(c => c.Place).ThenInclude(c => c.CategoryPlaces).ThenInclude(c => c.Category)
                 .ToListAsync();
             return posts;
+        }
+
+        public Task<int> InsertPlacePost(PlacePostRequest model)
+        {
+            throw new NotImplementedException();
         }
     }
 }
