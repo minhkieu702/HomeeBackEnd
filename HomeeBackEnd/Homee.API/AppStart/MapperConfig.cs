@@ -42,7 +42,7 @@ namespace Homee.API.AppStart
 
             #region Place
             CreateMap<Place, PlaceResponse>()
-                .ForMember(dest => dest.Direction, opt => opt.MapFrom(src => ((PlaceDirection)src.Direction).ToString()))
+                //.ForMember(dest => dest.Direction, opt => opt.MapFrom(src => ((PlaceDirection)src.Direction).ToString()))
                 .ReverseMap();
             CreateMap<PlaceRequest, Place>().ReverseMap();
             #endregion

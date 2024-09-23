@@ -1,6 +1,7 @@
 ﻿using Homee.BusinessLayer.IServices;
 using Homee.BusinessLayer.Services;
 using Homee.DataLayer.RequestModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -10,6 +11,7 @@ namespace Homee.API.Controllers
     [EnableCors("AllowAnyOrigins")]
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _service;

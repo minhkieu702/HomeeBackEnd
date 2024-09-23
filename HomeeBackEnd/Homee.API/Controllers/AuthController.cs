@@ -4,6 +4,8 @@ using Homee.BusinessLayer.IServices;
 using Homee.DataLayer.RequestModels;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Homee.API.Controllers
 {
@@ -18,8 +20,15 @@ namespace Homee.API.Controllers
         {
             _service = accountService;
         }
-        [HttpGet("GetOTPToRegister/{email}")]
-        public IActionResult Get(string email) => Ok(_service.ConfirmEmaiToRegister(email, HttpContext).Result);
+        [HttpPost("refresh")]
+        public IActionResult Refresh([FromBody] RefreshTokenModel refreshToken)
+        {
+            var result = _service.RefreshToken(refreshToken);
+            return result.Status >= 1 ? Ok(result) : Unauthorized();
+        }
+
+        [HttpGet("ConfirmOTPToRegister")]
+        public IActionResult Get(string otp) => Ok(_service.ConfirmOtpToRegister(otp, HttpContext).Result);
         
         [HttpGet("GetOTPToUpdatePassword/{email}")]
         public IActionResult GetOTPToUpdatePassword(string email) => Ok(_service.ConfirmEmaiToGetNewPassword(email, HttpContext).Result);
@@ -38,6 +47,7 @@ namespace Homee.API.Controllers
                     return Ok(new HomeeResult(Const.FAIL_CREATE_CODE, "The OTP is not correct."));
                 }
                 HttpContext.Session.Remove(OTP);
+                
                 return Ok(new HomeeResult(Const.SUCCESS_READ_CODE, "The OTP is correct."));
             }
             catch (Exception ex)
@@ -45,16 +55,23 @@ namespace Homee.API.Controllers
                 return Ok(new HomeeResult(Const.ERROR_EXCEPTION, "Something was wrong."));
             }
         }
-        
+
         [HttpPost("Register")]
-        public IActionResult Register(AccountRequest account) => Ok(_service.Register(account, HttpContext).Result);
-        
+        public IActionResult Register([EmailAddress] string email, string password)
+        {
+            return Ok(_service.Register(new AccountRequest { Email = email, Password = password}, HttpContext).Result);
+        }
+
         [HttpPost("ResetPassword")]
         public IActionResult ResetPassword(string password) => Ok(_service.ResetPassword(password, HttpContext).Result);
-        
+
         [HttpPost("Login")]
-        public IActionResult Login(string email, string password) => Ok(_service.Login(email, password, HttpContext).Result);
-        
+        public IActionResult Login(string email, string password)
+        {
+            var result = _service.Login(email, password, HttpContext).Result;
+            return result.Status >= 1 ? Ok(result) : Unauthorized();
+        }
+
         [HttpPost("Logout")]
         public IActionResult Logout()
         {
