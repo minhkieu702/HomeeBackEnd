@@ -21,6 +21,7 @@ namespace Homee.DataLayer.RequestModels
         public string Phone { get; set; } = null!;
         [AllowNull]
         public string? CitizenId { get; set; } = null!;
+        [JsonIgnore]
         [AllowNull]
         public int? Role { get; set; }
         [AllowNull]

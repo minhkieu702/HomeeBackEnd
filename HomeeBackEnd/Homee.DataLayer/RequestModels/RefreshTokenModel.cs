@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Homee.DataLayer.RequestModels
 {
-    public class ImageRequest
+    public class RefreshTokenModel
     {
-        public string ImageUrl { get; set; } = null!;
-        public int Number { get; set; }
+        public int AccountId { get; set; }
+        public int Role { get; set; }
+        public string RefreshToken { get; set; }
     }
 }

@@ -10,6 +10,7 @@ using Net.payOS.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -49,12 +50,7 @@ namespace Homee.Repositories.Repositories
         }
         public List<Order> GetAllOrders()
         {
-             var orders = _context.Orders.Include(c => c.Owner).Include(c => c.Subscription).ToList();
-            orders.ForEach(o =>
-            {
-                o.Owner.Orders = null;
-                o.Subscription.Orders = null;
-            }); 
+            var orders = _context.Orders.IncludeAll().ToList();
             return orders;
         }
 
@@ -102,7 +98,7 @@ namespace Homee.Repositories.Repositories
             }
         }
 
-        public async Task<int> InsertOrder(ReturnUrlRequest payment, HttpContext httpContext)
+        public async Task<int> InsertOrder(ReturnUrlRequest payment, ClaimsPrincipal user)
         {
             try
             {
@@ -111,7 +107,7 @@ namespace Homee.Repositories.Repositories
                 if (subscription == null) return 0;
                 
                 var accId = 1;
-                if (SupportingFeature.GetValueFromSession("user", out Account user, httpContext)) accId = user.AccountId;
+                //if (SupportingFeature.GetValueFromSession("user", out Account user, httpContext)) accId = user.AccountId;
 
                 var order = new Order
                 {
@@ -119,7 +115,7 @@ namespace Homee.Repositories.Repositories
                     SubscribedAt = DateTime.Now,
                     ExpiredAt = DateTime.Now.AddDays((double)subscription.Duration),
                     PaymentId = payment.PaymentId,
-                    OwnerId = accId
+                    OwnerId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier).ToString())
                 };
 
                 await _context.Orders.AddAsync(order);

@@ -35,8 +35,6 @@ namespace Homee.DataLayer.ResponseModels
 
         public bool? IsBlock { get; set; }
 
-        public virtual ICollection<InteriorResponse> Interiors { get; set; } = new List<InteriorResponse>();
-
         public virtual AccountResponse Owner { get; set; } = null!;
 
         public virtual ICollection<CategoryPlaceResponse> CategoryPlaces { get; set; } = new List<CategoryPlaceResponse>();

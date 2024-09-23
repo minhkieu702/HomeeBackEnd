@@ -39,10 +39,10 @@ namespace Homee.Repositories.Repositories
 
         public List<Place> GetPlaces()
         {
-            var places = _context.Places.AsNoTracking()
-                .Include(p => p.CategoryPlaces).ThenInclude(c => c.Category)
-                .Include(p => p.Posts).ThenInclude(c => c.Images)
-                .Include(p => p.Owner)
+            var places = _context.Places
+                //.Include(p => p.CategoryPlaces).ThenInclude(c => c.Category)
+                //.Include(p => p.Posts).ThenInclude(c => c.Images)
+                //.Include(p => p.Owner)
                 .ToList();
             //foreach (var place in places)
             //{
@@ -106,13 +106,8 @@ namespace Homee.Repositories.Repositories
                         Province = model.Province,
                         Ward = model.Ward,
                         Number = model.Number,
-                        Area = model.Area,
                         Street = model.Street,
-                        Rent = model.Rent,
-                        Direction = model.Direction,
                         Distinct = model.Distinct,
-                        NumberOfBedroom = model.NumberOfBedroom,
-                        NumberOfToilet = model.NumberOfToilet,
                         OwnerId = GetUserId(httpContext)
                     };
 
@@ -172,13 +167,8 @@ namespace Homee.Repositories.Repositories
                         Province = newPlace.Province,
                         Ward = newPlace.Ward,
                         Number = newPlace.Number,
-                        Area = newPlace.Area,
                         Street = newPlace.Street,
-                        Rent = newPlace.Rent,
-                        Direction = newPlace.Direction,
                         Distinct = newPlace.Distinct,
-                        NumberOfBedroom = newPlace.NumberOfBedroom,
-                        NumberOfToilet = newPlace.NumberOfToilet,
                         OwnerId = GetUserId(httpContext)
                     };
                     oldPlace = place;

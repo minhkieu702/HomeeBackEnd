@@ -18,26 +18,34 @@ namespace Homee.DataLayer.RequestModels
 
         public string Number { get; set; } = null!;
 
-        public double Area { get; set; }
+        public string? RoomName { get; set; }
 
-        public int Direction { get; set; }
+        public int? Direction { get; set; }
 
-        public int NumberOfToilet { get; set; }
+        public decimal? Area { get; set; }
 
-        public int NumberOfBedroom { get; set; }
+        public int? InteriorStatus { get; set; }
 
-        public double Rent { get; set; }
+        public bool? RentalStatus { get; set; }
 
-        public List<int> Categories { get; set; } = [];
+        public decimal? RentAmount { get; set; }
+
+        public decimal? WaterAmount { get; set; }
+
+        public decimal? ElectricAmount { get; set; }
+
+        public decimal? ServiceAmount { get; set; }
 
         public DateTime PostedDate { get; set; }
 
         public string? Note { get; set; }
 
-        public int PlaceId { get; set; }
+        public string? Title { get; set; }
+
+        public List<int> Categories { get; set; } = [];
 
         public int Status { get; set; }
 
-        public List<string> ImageUrls { get; set; } = [];
+        public List<ImageRequest> ImageUrls { get; set; } = [];
     }
 }

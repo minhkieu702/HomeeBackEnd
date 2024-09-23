@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Homee.DataLayer.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -22,6 +24,25 @@ namespace Homee.BusinessLayer.Helpers
 
             return propInfo.GetValue(obj);
         }
+        public static IQueryable<TEntity> IncludeAll<TEntity>(this IQueryable<TEntity> query) where TEntity : class
+        {
+            HomeedbContext _context = new HomeedbContext();
+
+            var entityType = typeof(TEntity);
+
+            // Lấy tất cả các navigation properties của entity
+            var navigations = _context.Model.FindEntityType(entityType)
+                .GetNavigations();
+
+            foreach (var navigation in navigations)
+            {
+                // Gọi Include cho mỗi navigation property
+                query = query.Include(navigation.Name);
+            }
+
+            return query;
+        }
+
     }
     public class SupportingFeature
     {
