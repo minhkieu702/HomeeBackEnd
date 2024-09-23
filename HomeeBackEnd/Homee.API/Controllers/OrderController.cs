@@ -20,7 +20,7 @@ namespace Homee.API.Controllers
             _config = configuration;
             _service = placeService;
         }
-        [Authorize(Roles = "0")]
+        [Authorize]
         [HttpPost("Create")]
         public IActionResult Create([FromBody] int subscriptionId) => Ok(_service.Create(subscriptionId).Result);
 

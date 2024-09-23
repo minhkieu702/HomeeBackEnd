@@ -20,12 +20,12 @@ namespace Homee.API.Controllers
         {
             _service = accountService;
         }
-        [HttpPost("refresh")]
-        public IActionResult Refresh([FromBody] RefreshTokenModel refreshToken)
-        {
-            var result = _service.RefreshToken(refreshToken);
-            return result.Status >= 1 ? Ok(result) : Unauthorized();
-        }
+        //[HttpPost("refresh")]
+        //public IActionResult Refresh([FromBody] RefreshTokenModel refreshToken)
+        //{
+        //    var result = _service.RefreshToken(refreshToken);
+        //    return result.Status >= 1 ? Ok(result) : Unauthorized();
+        //}
 
         [HttpGet("ConfirmOTPToRegister")]
         public IActionResult Get(string otp) => Ok(_service.ConfirmOtpToRegister(otp, HttpContext).Result);

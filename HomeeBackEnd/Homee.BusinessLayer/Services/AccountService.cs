@@ -18,6 +18,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 using static System.Net.WebRequestMethods;
 
 namespace Homee.BusinessLayer.Services
@@ -84,7 +85,7 @@ namespace Homee.BusinessLayer.Services
             try
             {
                 if (!SupportingFeature.GetValueFromSession("user", out Account user, context) ||
-                    !SupportingFeature.GetValueFromSession("otp", out string storedOtp, context) || 
+                    !SupportingFeature.GetValueFromSession("otp", out string storedOtp, context) ||
                     user == null ||
                     string.IsNullOrEmpty(storedOtp) ||
                     !otp.Equals(storedOtp)
@@ -92,10 +93,10 @@ namespace Homee.BusinessLayer.Services
                 {
                     return new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
                 }
-                
+
                 await _repo.InsertAsync(user);
                 var check = await _repo.SaveChangesAsync();
-                
+
                 return check > 0 ? new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG) : new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
             }
             catch (Exception ex)
@@ -163,7 +164,7 @@ namespace Homee.BusinessLayer.Services
         {
             try
             {
-                if(!SupportingFeature.GetValueFromSession("email", out string email, context) || string.IsNullOrEmpty(email))
+                if (!SupportingFeature.GetValueFromSession("email", out string email, context) || string.IsNullOrEmpty(email))
                 {
                     return new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
                 }
@@ -172,7 +173,7 @@ namespace Homee.BusinessLayer.Services
                 {
                     return new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
                 }
-                account.Password= password;
+                account.Password = password;
                 _repo.Update(account);
                 var check = await _repo.SaveChangesAsync();
                 if (check <= 0)
@@ -237,7 +238,7 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
-        private string GenerateJwtToken(string email, int role, int id)
+        private string GenerateJwtToken(Account account)
         {
             try
             {
@@ -245,11 +246,14 @@ namespace Homee.BusinessLayer.Services
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
                 var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Role, role.ToString()),
-                new Claim(ClaimTypes.NameIdentifier, id.ToString())
+                new Claim(ClaimTypes.NameIdentifier, account.AccountId.ToString()),
+                new Claim(ClaimTypes.Role, account.Role.ToString())
             };
                 var token = new JwtSecurityToken(_config["Jwt:Issuer"],
-                    _config["Jwt:Issuer"], claims, expires: DateTime.Now.AddHours(Convert.ToDouble(_config["Jwt:Time"])), signingCredentials: credentials);
+                    _config["Jwt:Issuer"],
+                    claims,
+                    expires: DateTime.Now.AddHours(120),
+                    signingCredentials: credentials);
                 return new JwtSecurityTokenHandler().WriteToken(token);
             }
             catch (Exception)
@@ -259,49 +263,22 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
-        private string GenerateRefreshToken()
-        {
-            var randomNumber = new byte[32];
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(randomNumber);
-                return Convert.ToBase64String(randomNumber);
-            }
-        }
-
         public async Task<IHomeeResult> Login(string email, string password, HttpContext context)
         {
             try
             {
                 var account = _repo.GetAll(c => c.Email.Equals(email) && c.Password.Equals(password)).FirstOrDefault();
 
-                if(account == null) return new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
+                if (account == null) return new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
 
-                var token = GenerateJwtToken(account.Email, account.Role, account.AccountId);
-                //var refreshToken = GenerateRefreshToken();
+                var token = GenerateJwtToken(account);
 
-                //_cache.Set(account.AccountId, refreshToken, TimeSpan.FromMinutes(119));
-                
                 return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, token);
             }
             catch (Exception ex)
             {
                 return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
             }
-        }
-
-        public IHomeeResult RefreshToken(RefreshTokenModel model)
-        {
-            if (_cache.TryGetValue(model.AccountId, out string storedToken) 
-                && !string.IsNullOrEmpty(storedToken) 
-                && storedToken.Equals(model.RefreshToken))
-            {
-                var newRefreshToken = GenerateRefreshToken();
-                _cache.Set(model.AccountId, newRefreshToken, TimeSpan.FromMinutes(119));
-
-                return new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG, new {RefreshToken = newRefreshToken});
-            }
-            return new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
         }
 
         public async Task<IHomeeResult> Update(int id, AccountRequest model)
@@ -313,7 +290,7 @@ namespace Homee.BusinessLayer.Services
                 {
                     return new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);
                 }
-                
+
                 result.UpdatedAt = DateTime.Now;
                 result.Password = model.Password;
                 result.ImageUrl = model.ImageUrl;

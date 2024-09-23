@@ -11,7 +11,6 @@ namespace Homee.API.Controllers
     [EnableCors("AllowAnyOrigins")]
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _service;
@@ -22,8 +21,10 @@ namespace Homee.API.Controllers
         }
 
         [HttpPost("Create")]
+        [Authorize]
         public IActionResult Create([FromBody] AccountRequest account) => Ok(_service.Create(account).Result);
 
+        [Authorize]
         [HttpGet("GetAll")]
         public IActionResult GetAll() => Ok(_service.GetAll());
 

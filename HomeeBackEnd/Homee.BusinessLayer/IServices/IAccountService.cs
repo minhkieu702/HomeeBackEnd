@@ -22,6 +22,5 @@ namespace Homee.BusinessLayer.IServices
         Task<IHomeeResult> ConfirmEmaiToGetNewPassword(string email, HttpContext context);
         Task<IHomeeResult> Register(AccountRequest model, HttpContext context);
         Task<IHomeeResult> ResetPassword(string password, HttpContext context);
-        IHomeeResult RefreshToken(RefreshTokenModel model);
     }
 }
