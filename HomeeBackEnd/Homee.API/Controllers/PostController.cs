@@ -1,5 +1,6 @@
 ﻿using Homee.BusinessLayer.IServices;
 using Homee.DataLayer.RequestModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,13 +17,15 @@ namespace Homee.API.Controllers
         {
             _service = service;
         }
-
+        
         [HttpPost("Create")]
         public IActionResult Create([FromBody] PostRequest post) => Ok(_service.Create(post).Result);
-
+        [Authorize]
         [HttpGet("GetAll")]
         public IActionResult GetAll() => Ok(_service.GetAll().Result);
 
+        [HttpGet("GetByAccountId")]
+        public IActionResult GetByAccountId() => Ok(_service.GetByCurrentUser(User).Result);
         [HttpGet("GetById/{id}")]
         public IActionResult GetById(int id) => Ok(_service.GetById(id).Result);
 

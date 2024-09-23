@@ -1,16 +1,8 @@
-﻿using Homee.BusinessLayer.Commons;
-using Homee.BusinessLayer.Helpers;
-using Homee.BusinessLayer.IServices;
+﻿using Homee.BusinessLayer.IServices;
 using Homee.DataLayer.RequestModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Net.payOS;
-using Net.payOS.Types;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
-using System.Text;
 
 namespace Homee.API.Controllers
 
@@ -28,7 +20,7 @@ namespace Homee.API.Controllers
             _config = configuration;
             _service = placeService;
         }
-
+        [Authorize(Roles = "0")]
         [HttpPost("Create")]
         public IActionResult Create([FromBody] int subscriptionId) => Ok(_service.Create(subscriptionId).Result);
 
@@ -37,6 +29,9 @@ namespace Homee.API.Controllers
 
         [HttpGet("GetById/{id}")]
         public IActionResult GetById(int id) => Ok(_service.GetById(id));
+
+        [HttpGet("GetByCurrentUser")]
+        public IActionResult GetByCurrentUser() => Ok(_service.GetByCurrentUser(User).Result);
 
         [HttpPut("Update/{id}")]
         public IActionResult Update(int id, [FromBody] OrderRequest category) => Ok(_service.Update(id, category).Result);
@@ -55,7 +50,7 @@ namespace Homee.API.Controllers
             result.PaymentId = HttpContext.Request.Query["id"].ToString();
             result.Status = HttpContext.Request.Query["status"].ToString();
             
-            return Ok(_service.ExecutePayment(result, HttpContext).Result);
+            return Ok(_service.ExecutePayment(result, User).Result);
         }
     }
 }
