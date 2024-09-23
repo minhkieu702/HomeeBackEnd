@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -39,7 +40,7 @@ namespace Homee.BusinessLayer.Services
                 return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
             }
         }
-        public async Task<IHomeeResult> PublishPost(PlacePostRequest model)
+        public async Task<IHomeeResult> PublishPost(PlacePostRequest model, ClaimsPrincipal user)
         {
             try
             {
@@ -48,7 +49,9 @@ namespace Homee.BusinessLayer.Services
                 {
                     return new HomeeResult(Const.FAIL_CREATE_CODE, "This address is already registered.");
                 }
-                var check = await _repo.InsertPlacePost(model);
+                //var ownerId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+                
+                var check = await _repo.InsertPlacePost(model, user);
                 return check >= 0 ? new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG) : new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
             }
             catch (Exception ex)
@@ -90,9 +93,22 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
-        public Task<IHomeeResult> GetByCurrentUser(HttpContext context)
+        public async Task<IHomeeResult> GetByCurrentUser(ClaimsPrincipal user)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var aId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+                
+                if (!int.TryParse(aId, out int accountId))
+                return new HomeeResult(Const.WARNING_NO_DATA_CODE, "You must login first!");
+                
+                var posts = await _repo.GetPosts();
+                return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, posts);
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
         }
 
         public async Task<IHomeeResult> GetById(int id)
@@ -111,9 +127,21 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
-        public Task<IHomeeResult> Update(int id, PostRequest model)
+        public async Task<IHomeeResult> Update(int id, PostRequest model)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await _repo.GetById(id);
+                if(result == null) return new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);
+
+                var check = await _repo.UpdatePost(id, model);
+                return check >= 1 ? new HomeeResult(Const.SUCCESS_UPDATE_CODE, Const.SUCCESS_UPDATE_MSG) : new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
     }
 }

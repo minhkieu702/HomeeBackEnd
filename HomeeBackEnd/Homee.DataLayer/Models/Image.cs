@@ -11,5 +11,7 @@ public partial class Image
 
     public int PostId { get; set; }
 
+    public int? Number { get; set; }
+
     public virtual Post Post { get; set; } = null!;
 }

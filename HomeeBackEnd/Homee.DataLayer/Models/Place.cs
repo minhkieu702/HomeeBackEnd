@@ -17,21 +17,9 @@ public partial class Place
 
     public string Number { get; set; } = null!;
 
-    public double Area { get; set; }
-
-    public int Direction { get; set; }
-
-    public int NumberOfToilet { get; set; }
-
-    public int NumberOfBedroom { get; set; }
-
-    public double Rent { get; set; }
-
     public int OwnerId { get; set; }
 
     public bool IsBlock { get; set; }
-
-    public int? InteriorStatus { get; set; }
 
     public virtual ICollection<CategoryPlace> CategoryPlaces { get; set; } = new List<CategoryPlace>();
 
@@ -39,5 +27,5 @@ public partial class Place
 
     public virtual Account Owner { get; set; } = null!;
 
-    public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
+    public virtual ICollection<Room> Rooms { get; set; } = new List<Room>();
 }

@@ -15,9 +15,9 @@ public partial class Account
 
     public string Name { get; set; } = null!;
 
-    public string Phone { get; set; } = null!;
+    public string? Phone { get; set; }
 
-    public string CitizenId { get; set; } = null!;
+    public string? CitizenId { get; set; }
 
     public int Role { get; set; }
 

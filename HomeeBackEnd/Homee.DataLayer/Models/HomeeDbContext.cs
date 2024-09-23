@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Homee.DataLayer.Models;
 
@@ -36,25 +35,14 @@ public partial class HomeedbContext : DbContext
 
     public virtual DbSet<Post> Posts { get; set; }
 
+    public virtual DbSet<Room> Rooms { get; set; }
+
     public virtual DbSet<Subscription> Subscriptions { get; set; }
 
-    //    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-    //        => optionsBuilder.UseSqlServer("Server=(local);Uid=sa;Pwd=1234567890;Database=HomeeDB; TrustServerCertificate=True");
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlServer(GetConnectionString());
-    }
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("workstation id=homeedb.mssql.somee.com;packet size=4096;user id=quangminh_SQLLogin_1;pwd=at22vmjqnq;data source=homeedb.mssql.somee.com;persist security info=False;initial catalog=homeedb;TrustServerCertificate=True");
 
-    private string GetConnectionString()
-    {
-        IConfiguration config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", true, true)
-            .Build();
-        var strConn = config.GetConnectionString("DefaultConnectionStringDB");
-        return strConn;
-    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Account>(entity =>
@@ -64,14 +52,18 @@ public partial class HomeedbContext : DbContext
             entity.ToTable("Account");
 
             entity.Property(e => e.BirthDay).HasColumnType("datetime");
-            entity.Property(e => e.CitizenId).HasMaxLength(50);
+            entity.Property(e => e.CitizenId)
+                .HasMaxLength(50)
+                .IsUnicode(false);
             entity.Property(e => e.CreatedAt).HasColumnType("datetime");
             entity.Property(e => e.Email).HasMaxLength(255);
             entity.Property(e => e.GoogleUserId).HasMaxLength(255);
             entity.Property(e => e.ImageUrl).HasMaxLength(255);
             entity.Property(e => e.Name).HasMaxLength(255);
             entity.Property(e => e.Password).HasMaxLength(255);
-            entity.Property(e => e.Phone).HasMaxLength(50);
+            entity.Property(e => e.Phone)
+                .HasMaxLength(50)
+                .IsUnicode(false);
             entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
         });
 
@@ -217,11 +209,30 @@ public partial class HomeedbContext : DbContext
             entity.ToTable("Post");
 
             entity.Property(e => e.PostedDate).HasColumnType("datetime");
+            entity.Property(e => e.Title).HasMaxLength(500);
 
-            entity.HasOne(d => d.Place).WithMany(p => p.Posts)
+            entity.HasOne(d => d.Room).WithMany(p => p.Posts)
+                .HasForeignKey(d => d.RoomId)
+                .HasConstraintName("FK_Post_Room");
+        });
+
+        modelBuilder.Entity<Room>(entity =>
+        {
+            entity.HasKey(e => e.RoomId).HasName("PK__Room__328639196F4E51A9");
+
+            entity.ToTable("Room");
+
+            entity.Property(e => e.RoomId).HasColumnName("RoomID");
+            entity.Property(e => e.Area).HasColumnType("decimal(18, 0)");
+            entity.Property(e => e.ElectricAmount).HasColumnType("decimal(18, 0)");
+            entity.Property(e => e.RentAmount).HasColumnType("decimal(18, 0)");
+            entity.Property(e => e.RoomName).HasMaxLength(255);
+            entity.Property(e => e.ServiceAmount).HasColumnType("decimal(18, 0)");
+            entity.Property(e => e.WaterAmount).HasColumnType("decimal(18, 0)");
+
+            entity.HasOne(d => d.Place).WithMany(p => p.Rooms)
                 .HasForeignKey(d => d.PlaceId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Post_Place");
+                .HasConstraintName("FK__Room__PlaceId__74AE54BC");
         });
 
         modelBuilder.Entity<Subscription>(entity =>
