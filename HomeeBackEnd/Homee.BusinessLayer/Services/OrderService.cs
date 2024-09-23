@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -63,14 +64,14 @@ namespace Homee.BusinessLayer.Services
             }
         }
         
-        public async Task<IHomeeResult> ExecutePayment(ReturnUrlRequest payment, HttpContext httpContext)
+        public async Task<IHomeeResult> ExecutePayment(ReturnUrlRequest payment, ClaimsPrincipal user)
         {
             try
             {
                 var result = await _repo.CanInsert(payment);
                 if (result == -1) return new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
                 if (result == 0) return new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG);
-                var check = await _repo.InsertOrder(payment, httpContext);
+                var check = await _repo.InsertOrder(payment, user);
                 return check > 0 ? new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG) : new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
             }
             catch (Exception ex)
@@ -85,6 +86,20 @@ namespace Homee.BusinessLayer.Services
             {
                 var result = _repo.GetAllOrders();
                 return result.Count() == 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(_mappper.Map<OrderResponse>));
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
+        }
+
+        public async Task<IHomeeResult> GetByCurrentUser(ClaimsPrincipal user)
+        {
+            try
+            {
+                var aid = user.FindFirstValue(ClaimTypes.NameIdentifier);
+                var orders = _repo.GetAll(c => c.OwnerId == int.Parse(aid));
+                return orders.Count() <= 0 ? new HomeeResult(Const.FAIL_READ_CODE, Const.FAIL_READ_MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, orders);
             }
             catch (Exception ex)
             {

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +17,7 @@ namespace Homee.BusinessLayer.IServices
         Task<IHomeeResult> Update(int id, OrderRequest model);
         Task<IHomeeResult>Create(int model);
         Task<IHomeeResult> Delete(int id);
-        Task<IHomeeResult> ExecutePayment(ReturnUrlRequest result, HttpContext httpContext);
+        Task<IHomeeResult> ExecutePayment(ReturnUrlRequest result, ClaimsPrincipal user);
+        Task<IHomeeResult> GetByCurrentUser(ClaimsPrincipal user);
     }
 }
