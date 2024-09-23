@@ -17,7 +17,7 @@ namespace Homee.API.Controllers
         {
             _service = service;
         }
-        
+        [Authorize]
         [HttpPost("Create")]
         public IActionResult Create([FromBody] PostRequest post) => Ok(_service.Create(post).Result);
         [Authorize]

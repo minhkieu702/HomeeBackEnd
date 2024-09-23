@@ -69,7 +69,7 @@ namespace Homee.API.Controllers
         public IActionResult Login(string email, string password)
         {
             var result = _service.Login(email, password, HttpContext).Result;
-            return result.Status >= 1 ? Ok(result) : Unauthorized();
+            return result.Status >= 1 ? Ok(result.Data.ToString()) : Unauthorized(result);
         }
 
         [HttpPost("Logout")]

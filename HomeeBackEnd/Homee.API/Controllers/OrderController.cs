@@ -31,6 +31,7 @@ namespace Homee.API.Controllers
         public IActionResult GetById(int id) => Ok(_service.GetById(id));
 
         [HttpGet("GetByCurrentUser")]
+        [Authorize]
         public IActionResult GetByCurrentUser() => Ok(_service.GetByCurrentUser(User).Result);
 
         [HttpPut("Update/{id}")]

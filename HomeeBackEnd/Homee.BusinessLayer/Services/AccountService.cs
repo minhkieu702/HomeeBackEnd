@@ -239,25 +239,24 @@ namespace Homee.BusinessLayer.Services
 
         private string GenerateJwtToken(string email, int role, int id)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]);
-
-            var tokenDescriptior = new SecurityTokenDescriptor
+            try
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.Email, email),
-                    new Claim(ClaimTypes.Role, role.ToString()),
-                    new Claim(ClaimTypes.NameIdentifier, id.ToString())
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(double.Parse(_config["Jwt:Time"])),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-                Issuer = _config["Jwt:Issuer"],
-                Audience = _config["Jwt:Issuer"]
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+                var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Role, role.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, id.ToString())
             };
+                var token = new JwtSecurityToken(_config["Jwt:Issuer"],
+                    _config["Jwt:Issuer"], claims, expires: DateTime.Now.AddHours(Convert.ToDouble(_config["Jwt:Time"])), signingCredentials: credentials);
+                return new JwtSecurityTokenHandler().WriteToken(token);
+            }
+            catch (Exception)
+            {
 
-            var token = tokenHandler.CreateToken(tokenDescriptior);
-            return tokenHandler.WriteToken(token);
+                throw;
+            }
         }
 
         private string GenerateRefreshToken()
@@ -279,11 +278,11 @@ namespace Homee.BusinessLayer.Services
                 if(account == null) return new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
 
                 var token = GenerateJwtToken(account.Email, account.Role, account.AccountId);
-                var refreshToken = GenerateRefreshToken();
+                //var refreshToken = GenerateRefreshToken();
 
-                _cache.Set(account.AccountId, refreshToken, TimeSpan.FromMinutes(119));
+                //_cache.Set(account.AccountId, refreshToken, TimeSpan.FromMinutes(119));
                 
-                return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, new {Token = token, RefreshToken = refreshToken });
+                return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, token);
             }
             catch (Exception ex)
             {
