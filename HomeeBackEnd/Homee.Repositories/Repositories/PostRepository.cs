@@ -110,7 +110,7 @@ namespace Homee.Repositories.Repositories
             {
                 try
                 {
-                    var aId = user.FindFirst(ClaimTypes.NameIdentifier);
+                    var aId = user.FindFirst(ClaimTypes.NameIdentifier).Value;
 
                     #region Insert Place
                     var place = new Place

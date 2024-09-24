@@ -18,5 +18,7 @@ namespace Homee.BusinessLayer.IServices
         Task<IHomeeResult> Delete(int id);
         Task<IHomeeResult> Create(PostRequest model);
         Task<IHomeeResult> GetByCurrentUser(ClaimsPrincipal user);
+        Task<IHomeeResult> PublishPost(PlacePostRequest model, ClaimsPrincipal user);
+        Task<IHomeeResult> UpdatePlacePost(int id, PlacePostRequest model);
     }
 }

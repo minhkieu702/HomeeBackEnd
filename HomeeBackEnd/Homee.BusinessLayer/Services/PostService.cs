@@ -45,7 +45,7 @@ namespace Homee.BusinessLayer.Services
             try
             {
                 var result = await _repo.CanInsert(model);
-                if (!result)
+                if (result)
                 {
                     return new HomeeResult(Const.FAIL_CREATE_CODE, "This address is already registered.");
                 }
@@ -137,8 +137,23 @@ namespace Homee.BusinessLayer.Services
             }
             catch (Exception ex)
             {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
+        }
 
-                throw;
+        public async Task<IHomeeResult> UpdatePlacePost(int id, PlacePostRequest model)
+        {
+            try
+            {
+                var result = await _repo.GetById(id);
+                if (result == null) return new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);
+
+                var check = await _repo.UpdatePlacePost(id, model);
+                return check >= 1 ? new HomeeResult(Const.SUCCESS_UPDATE_CODE, Const.SUCCESS_UPDATE_MSG) : new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
             }
         }
     }
