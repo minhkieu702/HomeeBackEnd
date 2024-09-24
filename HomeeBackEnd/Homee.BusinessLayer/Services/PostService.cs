@@ -96,10 +96,8 @@ namespace Homee.BusinessLayer.Services
         public async Task<IHomeeResult> GetByCurrentUser(ClaimsPrincipal user)
         {
             try
-            {
-                var aId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-                
-                if (!int.TryParse(aId, out int accountId))
+            {   
+                if (!int.TryParse(user.FindFirst(ClaimTypes.NameIdentifier).Value, out int accountId))
                 return new HomeeResult(Const.WARNING_NO_DATA_CODE, "You must login first!");
                 
                 var posts = await _repo.GetPosts();

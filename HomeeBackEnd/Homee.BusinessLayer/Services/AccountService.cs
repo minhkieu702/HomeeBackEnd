@@ -6,37 +6,29 @@ using Homee.DataLayer.Models;
 using Homee.DataLayer.RequestModels;
 using Homee.DataLayer.ResponseModels;
 using Homee.Repositories.IRepositories;
-using Homee.Repositories.Repositories;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Crypto;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Security.Principal;
 using System.Text;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Net.WebRequestMethods;
 
 namespace Homee.BusinessLayer.Services
 {
     public class AccountService : IAccountService
     {
-        private readonly IMemoryCache _cache;
-        private readonly IConfiguration _config;
-        private readonly IMailService _mailService;
         private readonly IMapper _mapper;
+        private readonly IMailService _mailService;
+        private readonly IConfiguration _config;
         private readonly IAccountRepository _repo;
 
-        public AccountService(IMapper mapper, IAccountRepository accountRepository, IMailService mailService, IConfiguration configuration, IMemoryCache memoryCache)
+
+        public AccountService(IAccountRepository accountRepository, IConfiguration configuration, IMailService mailService, IMapper mapper)
         {
-            _cache = memoryCache;
-            _config = configuration;
-            _mailService = mailService;
             _mapper = mapper;
+            _mailService = mailService;
+            _config = configuration;
             _repo = accountRepository;
         }
         public async Task<IHomeeResult> Block(int id)
@@ -238,6 +230,43 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
+        public async Task<IHomeeResult> GetProfile(ClaimsPrincipal user)
+        {
+            try
+            {
+                if (!int.TryParse(user.FindFirst(ClaimTypes.NameIdentifier).Value, out int userId))
+                {
+                    return new HomeeResult(Const.FAIL_READ_CODE, Const.FAIL_READ_MSG);
+                }
+
+                var result = _repo.GetAccount(userId);
+
+                return result == null ? new HomeeResult(Const.FAIL_READ_CODE, Const.FAIL_READ_MSG) : new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG, result);
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
+        }
+
+        public async Task<IHomeeResult> Login(string email, string password)
+        {
+            try
+            {
+                var account = _repo.GetAll(c => c.Email.Equals(email) && c.Password.Equals(password)).FirstOrDefault();
+
+                if (account == null) return new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
+
+                var token = GenerateJwtToken(account);
+
+                return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, token);
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
+        }
+
         private string GenerateJwtToken(Account account)
         {
             try
@@ -260,24 +289,6 @@ namespace Homee.BusinessLayer.Services
             {
 
                 throw;
-            }
-        }
-
-        public async Task<IHomeeResult> Login(string email, string password, HttpContext context)
-        {
-            try
-            {
-                var account = _repo.GetAll(c => c.Email.Equals(email) && c.Password.Equals(password)).FirstOrDefault();
-
-                if (account == null) return new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
-
-                var token = GenerateJwtToken(account);
-
-                return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, token);
-            }
-            catch (Exception ex)
-            {
-                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
             }
         }
 

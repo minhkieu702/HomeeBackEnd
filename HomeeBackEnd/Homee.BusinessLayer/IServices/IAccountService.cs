@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,10 +18,11 @@ namespace Homee.BusinessLayer.IServices
         Task<IHomeeResult> Update(int id, AccountRequest model);
         Task<IHomeeResult> Block(int id);
         Task<IHomeeResult> Create(AccountRequest model);
-        Task<IHomeeResult> Login(string email, string password, HttpContext context);
+        Task<IHomeeResult> Login(string email, string password);
         Task<IHomeeResult> ConfirmOtpToRegister(string otp, HttpContext context);
         Task<IHomeeResult> ConfirmEmaiToGetNewPassword(string email, HttpContext context);
         Task<IHomeeResult> Register(AccountRequest model, HttpContext context);
         Task<IHomeeResult> ResetPassword(string password, HttpContext context);
+        Task<IHomeeResult> GetProfile(ClaimsPrincipal user);
     }
 }
