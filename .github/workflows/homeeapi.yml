@@ -18,6 +18,8 @@ jobs:
       run: ls -R
     - name: Show content of Homee.API.csproj
       run: cat HomeeBackEnd/Homee.API/Homee.API.csproj
+    - name: Show current working directory
+      run: pwd
     - name: Restore
       run: dotnet restore "${{ env.WORKING_DIRECTORY }}/Homee.API.csproj"
     - name: Build
