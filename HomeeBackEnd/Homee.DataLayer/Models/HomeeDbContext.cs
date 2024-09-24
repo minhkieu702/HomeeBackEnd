@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Homee.DataLayer.Models;
 
@@ -40,8 +41,19 @@ public partial class HomeedbContext : DbContext
     public virtual DbSet<Subscription> Subscriptions { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("workstation id=homeedb.mssql.somee.com;packet size=4096;user id=quangminh_SQLLogin_1;pwd=at22vmjqnq;data source=homeedb.mssql.somee.com;persist security info=False;initial catalog=homeedb;TrustServerCertificate=True");
+    {
+        optionsBuilder.UseSqlServer(GetConnectionString());
+    }
+
+    private string GetConnectionString()
+    {
+        IConfiguration config = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", true, true)
+            .Build();
+        var strConn = config.GetConnectionString("DefaultConnectionStringDB");
+        return strConn;
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
