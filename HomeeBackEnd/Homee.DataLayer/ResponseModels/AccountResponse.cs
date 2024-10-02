@@ -37,10 +37,10 @@ namespace Homee.DataLayer.ResponseModels
 
         public bool IsBlock { get; set; }
         
-        public OrderResponse? LastOrder { get; set; }
+        public Order? LastOrder { get; set; }
 
         public virtual ICollection<NotificationResponse> Notifications { get; set; } = [];
 
-        public virtual ICollection<OrderResponse> Orders { get; set; } = new List<OrderResponse>();
+        public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Homee.DataLayer.RequestModels
 {
-    public class ReturnUrlRequest
+    public class PAYOS_RETURN_URLRequest
     {
         public int Code { get; set; }
         public int SubId { get; set; }

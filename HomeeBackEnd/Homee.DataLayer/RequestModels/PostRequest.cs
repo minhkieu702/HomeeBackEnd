@@ -14,6 +14,7 @@ namespace Homee.DataLayer.RequestModels
         public string? Note { get; set; }
 
         public int RoomId { get; set; }
+
         public string? Title { get; set; }
 
         public int Status { get; set; }
