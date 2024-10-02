@@ -156,5 +156,10 @@ namespace Homee.BusinessLayer.Services
                 return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
             }
         }
+
+        public async Task<IHomeeResult> CreateBasedOnPlace(ClaimsPrincipal claims, RoomPostRequest model)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -27,15 +27,17 @@ public partial class Account
 
     public DateTime UpdatedAt { get; set; }
 
-    public string? GoogleUserId { get; set; }
-
-    public bool IsGoogleAuthenticated { get; set; }
-
     public bool IsBlock { get; set; }
+
+    public bool? IsVerified { get; set; }
+
+    public string? VerificationToken { get; set; }
 
     public virtual ICollection<Contract> Contracts { get; set; } = new List<Contract>();
 
     public virtual ICollection<FavoritePost> FavoritePosts { get; set; } = new List<FavoritePost>();
+
+    public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
 
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 

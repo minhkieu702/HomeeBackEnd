@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Homee.DataLayer.Models;
 
@@ -18,6 +17,8 @@ public partial class HomeedbContext : DbContext
 
     public virtual DbSet<Account> Accounts { get; set; }
 
+    public virtual DbSet<Box> Boxes { get; set; }
+
     public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<CategoryPlace> CategoryPlaces { get; set; }
@@ -27,6 +28,8 @@ public partial class HomeedbContext : DbContext
     public virtual DbSet<FavoritePost> FavoritePosts { get; set; }
 
     public virtual DbSet<Image> Images { get; set; }
+
+    public virtual DbSet<Message> Messages { get; set; }
 
     public virtual DbSet<Notification> Notifications { get; set; }
 
@@ -39,21 +42,6 @@ public partial class HomeedbContext : DbContext
     public virtual DbSet<Room> Rooms { get; set; }
 
     public virtual DbSet<Subscription> Subscriptions { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlServer(GetConnectionString());
-    }
-
-    private string GetConnectionString()
-    {
-        IConfiguration config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", true, true)
-            .Build();
-        var strConn = config.GetConnectionString("DefaultConnectionStringDB");
-        return strConn;
-    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -69,14 +57,28 @@ public partial class HomeedbContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.CreatedAt).HasColumnType("datetime");
             entity.Property(e => e.Email).HasMaxLength(255);
-            entity.Property(e => e.GoogleUserId).HasMaxLength(255);
             entity.Property(e => e.ImageUrl).HasMaxLength(255);
+            entity.Property(e => e.IsVerified).HasDefaultValue(false);
             entity.Property(e => e.Name).HasMaxLength(255);
             entity.Property(e => e.Password).HasMaxLength(255);
             entity.Property(e => e.Phone)
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+            entity.Property(e => e.VerificationToken)
+                .HasMaxLength(500)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<Box>(entity =>
+        {
+            entity.HasKey(e => e.BoxId).HasName("PK__Box__136CF764A047EDC6");
+
+            entity.ToTable("Box");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
         });
 
         modelBuilder.Entity<Category>(entity =>
@@ -155,6 +157,25 @@ public partial class HomeedbContext : DbContext
                 .HasForeignKey(d => d.PostId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Image_Post");
+        });
+
+        modelBuilder.Entity<Message>(entity =>
+        {
+            entity.HasKey(e => e.MessageId).HasName("PK__Message__C87C0C9C49175822");
+
+            entity.ToTable("Message");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Account).WithMany(p => p.Messages)
+                .HasForeignKey(d => d.AccountId)
+                .HasConstraintName("FK__Message__Account__7E37BEF6");
+
+            entity.HasOne(d => d.Box).WithMany(p => p.Messages)
+                .HasForeignKey(d => d.BoxId)
+                .HasConstraintName("FK__Message__BoxId__7D439ABD");
         });
 
         modelBuilder.Entity<Notification>(entity =>
@@ -237,6 +258,7 @@ public partial class HomeedbContext : DbContext
             entity.Property(e => e.RoomId).HasColumnName("RoomID");
             entity.Property(e => e.Area).HasColumnType("decimal(18, 0)");
             entity.Property(e => e.ElectricAmount).HasColumnType("decimal(18, 0)");
+            entity.Property(e => e.IsBlock).HasDefaultValue(false);
             entity.Property(e => e.RentAmount).HasColumnType("decimal(18, 0)");
             entity.Property(e => e.RoomName).HasMaxLength(255);
             entity.Property(e => e.ServiceAmount).HasColumnType("decimal(18, 0)");
