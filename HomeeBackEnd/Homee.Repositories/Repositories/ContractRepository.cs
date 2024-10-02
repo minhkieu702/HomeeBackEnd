@@ -1,7 +1,9 @@
-﻿using Homee.DataLayer.Models;
+﻿using Homee.BusinessLayer.Helpers;
+using Homee.DataLayer.Models;
 using Homee.DataLayer.RequestModels;
 using Homee.Repositories.IRepositories;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Homee.Repositories.Repositories
 {
@@ -32,16 +34,26 @@ namespace Homee.Repositories.Repositories
         {
             try
             {
-                var contract = _context.Contracts.Include(c => c.Render).Include(c => c.Place).ThenInclude(c => c.Owner).FirstOrDefault(c => c.ContractId == id);
-                //if (contract == null) 
-                //{ 
-                //contract.Render.Contracts = null;
-                //contract.Render.Places = null;
-                //contract.Place.Contracts = null;
-                //contract.Place.Owner.Contracts = null;
-                //contract.Place.Owner.Places = null;
-                //}
-                return contract;
+                return _context.Contracts.IncludeAll().FirstOrDefault(c => c.ContractId == id);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public List<Contract> GetContractByCurrentUser(ClaimsPrincipal user)
+        {
+            try
+            {
+                var claim =  user.FindFirst(ClaimTypes.NameIdentifier);
+                if (claim.Value == null || !int.TryParse(claim.Value, out int uId))
+                {
+                    return null;
+                }
+
+                return _context.Contracts.IncludeAll().Where(c => c.Place.OwnerId == uId).ToList();
             }
             catch (Exception)
             {
@@ -52,16 +64,7 @@ namespace Homee.Repositories.Repositories
 
         public List<Contract> GetContracts()
         {
-            var contracts = _context.Contracts.Include(c => c.Render).Include(c => c.Place).ThenInclude(c => c.Owner).ToList();
-            //foreach (var contract in contracts)
-            //{
-            //    contract.Render.Contracts = null;
-            //    contract.Render.Places = null;
-            //    contract.Place.Contracts = null;
-            //    contract.Place.Owner.Contracts = null;
-            //    contract.Place.Owner.Places = null;
-            //}
-            return contracts;
+            return _context.Contracts.IncludeAll().ToList();
         }
     }
 }

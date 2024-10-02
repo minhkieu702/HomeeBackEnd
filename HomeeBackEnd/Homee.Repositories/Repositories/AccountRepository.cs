@@ -31,8 +31,7 @@ namespace Homee.Repositories.Repositories
         }
         public Account GetAccount(int id)
         {
-            var account = _context.Accounts.IncludeAll();
-            return account.FirstOrDefault(c => c.AccountId == id);
+            return _context.Accounts.IncludeAll().FirstOrDefault(c => c.AccountId == id);
         }
 
     }

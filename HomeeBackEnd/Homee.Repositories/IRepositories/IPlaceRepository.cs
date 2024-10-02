@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,7 +15,7 @@ namespace Homee.Repositories.IRepositories
         Task<bool> CanInsert(PlaceRequest model);
         Place GetPlace(int id);
         List<Place> GetPlaces();
-        Task<int> InsertPlace(PlaceRequest place, HttpContext httpContext);
-        Task<int> UpdatePlace(Place oldPlace, PlaceRequest newPlace, HttpContext httpContext);
+        Task<int> InsertPlace(PlaceRequest place, ClaimsPrincipal user);
+        Task<int> UpdatePlace(Place oldPlace, PlaceRequest newPlace, ClaimsPrincipal user);
     }
 }
