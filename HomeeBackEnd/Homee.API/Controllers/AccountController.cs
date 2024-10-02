@@ -19,7 +19,11 @@ namespace Homee.API.Controllers
         {
             _service = accountService;
         }
-
+        /// <summary>
+        /// Create by manager
+        /// </summary>
+        /// <param name="account"></param>
+        /// <returns></returns>
         [HttpPost("Create")]
         [Authorize]
         public IActionResult Create([FromBody] AccountRequest account) => Ok(_service.Create(account).Result);

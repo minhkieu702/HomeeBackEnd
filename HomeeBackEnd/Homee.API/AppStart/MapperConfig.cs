@@ -24,7 +24,7 @@ namespace Homee.API.AppStart
             CreateMap<Contract, ContractRequest>().ReverseMap();
             CreateMap<Contract, ContractResponse>().ReverseMap();
             #endregion
-
+             
             #region FavoritePost
             CreateMap<FavoritePostRequest, FavoritePost>().ReverseMap();
             CreateMap<FavoritePost, FavoritePostResponse>().ReverseMap();
@@ -45,6 +45,18 @@ namespace Homee.API.AppStart
                 //.ForMember(dest => dest.Direction, opt => opt.MapFrom(src => ((PlaceDirection)src.Direction).ToString()))
                 .ReverseMap();
             CreateMap<PlaceRequest, Place>().ReverseMap();
+            #endregion
+
+            #region Room
+            CreateMap<RoomRequest, Room>()
+                .ForMember(dest => dest.RoomId, opt => opt.Ignore())
+                .ForMember(dest => dest.Place, opt => opt.Ignore())
+                .ForMember(dest => dest.Posts, opt => opt.Ignore())
+                .ReverseMap();
+            CreateMap<Room, RoomResponse>()
+                .ForMember(dest => dest.Direction, opt => opt.MapFrom(src => ((PlaceDirection)src.Direction).ToString()))
+                .ForMember(dest => dest.InteriorStatus, opt => opt.MapFrom(src => ((InteriorStatus)src.InteriorStatus).ToString()))
+                .ReverseMap();
             #endregion
 
             #region Post
