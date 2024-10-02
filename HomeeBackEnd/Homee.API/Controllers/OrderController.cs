@@ -44,7 +44,7 @@ namespace Homee.API.Controllers
         [HttpGet("return-url")]
         public IActionResult ExecutePayment()
         {
-            var result = new ReturnUrlRequest();
+            var result = new PAYOS_RETURN_URLRequest();
             result.Code = int.Parse(HttpContext.Request.Query["code"].ToString());
             result.SubId = int.Parse(HttpContext.Request.Query["ordercode"].ToString().Substring(0, 1));
             result.Cancel = bool.Parse(HttpContext.Request.Query["cancel"].ToString());
