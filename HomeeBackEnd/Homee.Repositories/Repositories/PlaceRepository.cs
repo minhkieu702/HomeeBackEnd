@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -34,59 +35,22 @@ namespace Homee.Repositories.Repositories
 
         public Place GetPlace(int id)
         {
-            return GetPlaces().FirstOrDefault(c => c.PlaceId == id);
+            return _context.Places.IncludeAll().FirstOrDefault(c => c.PlaceId == id);
         }
 
         public List<Place> GetPlaces()
         {
-            var places = _context.Places
-                //.Include(p => p.CategoryPlaces).ThenInclude(c => c.Category)
-                //.Include(p => p.Posts).ThenInclude(c => c.Images)
-                //.Include(p => p.Owner)
-                .ToList();
-            //foreach (var place in places)
-            //{
-            //    if (place.CategoryPlaces.Count() > 0)
-            //    {
-            //        foreach (var item in place.CategoryPlaces)
-            //        {
-            //            item.Category.CategoryPlaces = null;
-            //            item.Place = null;
-            //        }
-            //    }
-
-            //    if (place.Interiors.Count() > 0)
-            //    {
-            //        foreach (var item in place.Interiors)
-            //        {
-            //            item.Place = null;
-            //        }
-            //    }
-
-            //    if (place.Contracts.Count() > 0)
-            //    {
-            //        foreach (var item in place.Contracts)
-            //        {
-            //            item.Place = null;
-            //            item.Render.Places = null;
-            //        }
-            //    }
-
-            //    place.Owner.Places = null;
-            //    place.Owner.Contracts = null;
-            //}
-            return places;
+            return _context.Places.IncludeAll().ToList();
         }
-        private int GetUserId(HttpContext httpContext)
+        private int GetUserId(ClaimsPrincipal user)
         {
             try
             {
-                var userid = 1;
-                if (!SupportingFeature.GetValueFromSession("user", out Account user, httpContext) && user != null)
+                if (!int.TryParse(user.FindFirst(ClaimTypes.NameIdentifier).Value, out int uerid))
                 {
-                    userid = int.Parse(user.AccountId.ToString());
+                    return 0;
                 }
-                return userid;
+                return uerid;
             }
             catch (Exception)
             {
@@ -94,7 +58,7 @@ namespace Homee.Repositories.Repositories
                 throw;
             }
         }
-        public async Task<int> InsertPlace(PlaceRequest model, HttpContext httpContext)
+        public async Task<int> InsertPlace(PlaceRequest model, ClaimsPrincipal user)
         {
             using (var transaction = _context.Database.BeginTransaction())
             {
@@ -108,7 +72,7 @@ namespace Homee.Repositories.Repositories
                         Number = model.Number,
                         Street = model.Street,
                         Distinct = model.Distinct,
-                        OwnerId = GetUserId(httpContext)
+                        OwnerId = GetUserId(user)
                     };
 
                     // Add the Place entity to the context
@@ -154,7 +118,7 @@ namespace Homee.Repositories.Repositories
                 }
             }
         }
-        public async Task<int> UpdatePlace(Place oldPlace, PlaceRequest newPlace, HttpContext httpContext)
+        public async Task<int> UpdatePlace(Place oldPlace, PlaceRequest newPlace, ClaimsPrincipal user)
         {
             using (var transaction = _context.Database.BeginTransaction())
             {
@@ -169,7 +133,7 @@ namespace Homee.Repositories.Repositories
                         Number = newPlace.Number,
                         Street = newPlace.Street,
                         Distinct = newPlace.Distinct,
-                        OwnerId = GetUserId(httpContext)
+                        OwnerId = GetUserId(user)
                     };
                     oldPlace = place;
                     _context.Places.Update(oldPlace);

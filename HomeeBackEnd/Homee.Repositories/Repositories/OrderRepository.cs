@@ -40,13 +40,7 @@ namespace Homee.Repositories.Repositories
         }
         public Order GetOrder(int id)
         {
-            var order = _context.Orders.Include(c => c.Owner).Include(c => c.Subscription).FirstOrDefault(c => c.OrderId == id);
-            if (order != null)
-            {
-                order.Owner.Orders = null;
-                order.Subscription.Orders = null;
-            }
-            return order;
+            return _context.Orders.IncludeAll().FirstOrDefault(c => c.OrderId == id);
         }
         public List<Order> GetAllOrders()
         {
@@ -54,7 +48,7 @@ namespace Homee.Repositories.Repositories
             return orders;
         }
 
-        public async Task<int> CanInsert(ReturnUrlRequest request)
+        public async Task<int> CanInsert(PAYOS_RETURN_URLRequest request)
         {
             try
             {
@@ -85,7 +79,7 @@ namespace Homee.Repositories.Repositories
                                 
                 List<ItemData> items = [item];
 
-                var paymentData = new PaymentData(long.Parse(subId.ToString() + DateTime.Now.Ticks%100000), item.price, subscription.SubscriptionName, items, _config["LocalHostUrl"], _config["LocalHostUrl"]);
+                var paymentData = new PaymentData(long.Parse(subId.ToString() + DateTime.Now.Ticks%100000), item.price, subscription.SubscriptionName, items, _config["PAYOS_RETURN_URL"], _config["PAYOS_RETURN_URL"]);
 
                 CreatePaymentResult createPayment = await payOS.createPaymentLink(paymentData);
                 
@@ -98,7 +92,7 @@ namespace Homee.Repositories.Repositories
             }
         }
 
-        public async Task<int> InsertOrder(ReturnUrlRequest payment, ClaimsPrincipal user)
+        public async Task<int> InsertOrder(PAYOS_RETURN_URLRequest payment, ClaimsPrincipal user)
         {
             try
             {

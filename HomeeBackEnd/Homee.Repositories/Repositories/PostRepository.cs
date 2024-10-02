@@ -87,19 +87,13 @@ namespace Homee.Repositories.Repositories
         public async Task<Post> GetPostById(int id)
         {
             var post = await _context.Posts.IncludeAll()
-                //.Include(c => c.Images)
-                //.Include(c => c.Room).ThenInclude(c => c.Place)
-                //.ThenInclude(c => c.Owner)
                 .FirstOrDefaultAsync(c => c.PostId == id);
             return post;
         }
 
         public async Task<IList<Post>> GetPosts()
         {
-            var posts = await _context.Posts
-                //.Include(c => c.Images)
-                //.Include(c => c.Place).ThenInclude(c => c.Owner)
-                //.Include(c => c.Place).ThenInclude(c => c.CategoryPlaces).ThenInclude(c => c.Category)
+            var posts = await _context.Posts.IncludeAll()
                 .ToListAsync();
             return posts;
         }
@@ -148,7 +142,7 @@ namespace Homee.Repositories.Repositories
                         Direction = model.Direction,
                         Area = model.Area,
                         InteriorStatus = model.InteriorStatus,
-                        RentalStatus = model.RentalStatus,
+                        IsRented = model.IsRented,
                         RentAmount = model.RentAmount,
                         WaterAmount = model.WaterAmount,
                         ElectricAmount = model.ElectricAmount,
@@ -319,7 +313,7 @@ namespace Homee.Repositories.Repositories
                     room.Direction = model.Direction;
                     room.Area = model.Area;
                     room.InteriorStatus = model.InteriorStatus;
-                    room.RentalStatus = model.RentalStatus;
+                    room.IsRented = model.IsRented;
                     room.RentAmount = model.RentAmount;
                     room.WaterAmount = model.WaterAmount;
                     room.ElectricAmount = model.ElectricAmount;

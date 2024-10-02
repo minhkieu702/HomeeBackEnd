@@ -1,4 +1,5 @@
-﻿using Homee.DataLayer.Models;
+﻿using Homee.BusinessLayer.Helpers;
+using Homee.DataLayer.Models;
 using Homee.DataLayer.RequestModels;
 using Homee.DataLayer.ResponseModels;
 using Homee.Repositories.IRepositories;
@@ -27,13 +28,13 @@ namespace Homee.Repositories.Repositories
 
         public Subscription GetSubscription(int id)
         {
-            return _context.Subscriptions.Include(c => c.Orders).ThenInclude(c => c.Owner).FirstOrDefault(c => c.SubscriptionId == id);
+            return _context.Subscriptions.IncludeAll().FirstOrDefault(c => c.SubscriptionId == id);
 
         }
 
         public List<Subscription> GetSubscriptions()
         {
-            return _context.Subscriptions.Include(c => c.Orders).ThenInclude(c => c.Owner).ToList();
+            return _context.Subscriptions.IncludeAll().ToList();
         }
 
         public int CanDelete(int id)
