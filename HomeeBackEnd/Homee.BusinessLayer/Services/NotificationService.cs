@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,7 +23,7 @@ namespace Homee.BusinessLayer.Services
             throw new NotImplementedException();
         }
 
-        public Task<IHomeeResult> GetByCurrentUser(HttpContext context)
+        public Task<IHomeeResult> GetByCurrentUser(ClaimsPrincipal user)
         {
             throw new NotImplementedException();
         }

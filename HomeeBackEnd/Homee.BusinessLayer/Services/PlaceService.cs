@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Homee.DataLayer.ResponseModels;
+using System.Security.Claims;
 
 namespace Homee.BusinessLayer.Services
 {
@@ -58,7 +59,7 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
-        public Task<IHomeeResult> GetByCurrentUser(HttpContext context)
+        public Task<IHomeeResult> GetByCurrentUser(ClaimsPrincipal user)
         {
             throw new NotImplementedException();
         }
@@ -76,7 +77,7 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
-        public async Task<IHomeeResult> Insert(PlaceRequest model, HttpContext httpContext)
+        public async Task<IHomeeResult> Insert(PlaceRequest model, ClaimsPrincipal user)
         {
             try
             {
@@ -86,7 +87,7 @@ namespace Homee.BusinessLayer.Services
                     return new HomeeResult(Const.FAIL_CREATE_CODE, "This address is already registered.");
                 }
                 //await _repo.InsertPlace(_mapper.Map<Place>(model));
-                var check = await _repo.InsertPlace(model, httpContext);
+                var check = await _repo.InsertPlace(model, user);
                 return check <= 0 ?
                     new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG) :
                     new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG);
@@ -97,7 +98,7 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
-        public async Task<IHomeeResult> Update(int id, PlaceRequest model, HttpContext httpContext)
+        public async Task<IHomeeResult> Update(int id, PlaceRequest model, ClaimsPrincipal user)
         {
             try
             {
@@ -106,7 +107,7 @@ namespace Homee.BusinessLayer.Services
                 {
                     return new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);
                 }
-                var check = await _repo.UpdatePlace(result, model, httpContext);
+                var check = await _repo.UpdatePlace(result, model, user);
                 return check > 0 ?
                     new HomeeResult(Const.SUCCESS_UPDATE_CODE, Const.SUCCESS_UPDATE_MSG) :
                     new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);

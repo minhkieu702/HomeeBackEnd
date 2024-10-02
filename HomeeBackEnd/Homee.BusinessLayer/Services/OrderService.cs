@@ -64,7 +64,7 @@ namespace Homee.BusinessLayer.Services
             }
         }
         
-        public async Task<IHomeeResult> ExecutePayment(ReturnUrlRequest payment, ClaimsPrincipal user)
+        public async Task<IHomeeResult> ExecutePayment(PAYOS_RETURN_URLRequest payment, ClaimsPrincipal user)
         {
             try
             {
