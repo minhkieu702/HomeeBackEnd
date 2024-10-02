@@ -8,7 +8,8 @@ namespace Homee.BusinessLayer.Commons
 {
     public enum AccountRole
     {
-        Customer,
+        Free,//buy subscription then be premium
+        Premium, 
         Staff,
         Manager,
         Administrator
@@ -28,5 +29,9 @@ namespace Homee.BusinessLayer.Commons
     {
         None,
         Premium
+    }
+    public enum InteriorStatus
+    {
+        Empty, Basic, Full
     }
 }
