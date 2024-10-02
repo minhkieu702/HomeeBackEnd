@@ -72,40 +72,46 @@ namespace Homee.BusinessLayer.Services
                 return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
             }
         }
-        public async Task<IHomeeResult> ConfirmOtpToRegister(string otp, HttpContext context)
-        {
-            try
-            {
-                if (!SupportingFeature.GetValueFromSession("user", out Account user, context) ||
-                    !SupportingFeature.GetValueFromSession("otp", out string storedOtp, context) ||
-                    user == null ||
-                    string.IsNullOrEmpty(storedOtp) ||
-                    !otp.Equals(storedOtp)
-                    )
-                {
-                    return new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
-                }
+        //public async Task<IHomeeResult> ConfirmOtpToRegister(string otp, HttpContext context)
+        //{
+        //    try
+        //    {
+        //        if (!SupportingFeature.GetValueFromSession("user", out Account user, context) ||
+        //            !SupportingFeature.GetValueFromSession("otp", out string storedOtp, context) ||
+        //            user == null ||
+        //            string.IsNullOrEmpty(storedOtp) ||
+        //            !otp.Equals(storedOtp)
+        //            )
+        //        {
+        //            return new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
+        //        }
 
-                await _repo.InsertAsync(user);
-                var check = await _repo.SaveChangesAsync();
+        //        await _repo.InsertAsync(user);
+        //        var check = await _repo.SaveChangesAsync();
 
-                return check > 0 ? new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG) : new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
-            }
-            catch (Exception ex)
-            {
-                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
-            }
-        }
+        //        return check > 0 ? new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG) : new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+        //    }
+        //}
         public async Task<IHomeeResult> ConfirmEmaiToGetNewPassword(string email, HttpContext context)
         {
             try
             {
-                var accounts = _repo.GetAll();
-                if (!accounts.Any(c => c.Email.Equals(email)))
+                var accounts = _repo.GetAll(c => c.Email.Equals(email)).FirstOrDefault();
+                if (accounts == null)
                 {
                     return new HomeeResult(Const.FAIL_CREATE_CODE, "This email does already not exist.");
                 }
-                var result = await SendOtp(email, context);
+                var token = Guid.NewGuid().ToString() + DateTime.Now.Ticks;
+                
+                accounts.VerificationToken = token;
+                accounts.IsVerified = false;
+                _repo.Update(accounts);
+                _repo.SaveChanges();
+                var result = await SendOtp(email, context, token);
                 return result;
             }
             catch (Exception ex)
@@ -113,17 +119,12 @@ namespace Homee.BusinessLayer.Services
                 return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
             }
         }
-        private async Task<IHomeeResult> SendOtp(string email, HttpContext context)
+        private async Task<IHomeeResult> SendOtp(string email, HttpContext context, string otp)
         {
             try
             {
-                var otp = SupportingFeature.Instance.GenerateOTP();
-
-                var result = await _mailService.SendMail(email, "CONFIRMING CODE", otp);
-                if (result.Status > 0)
-                {
-                    SupportingFeature.SetValueToSession("otp", otp, context);
-                }
+                var content = $"<a href='{_config["Verify_Email_URL"]}?token={otp}'>Click here to verify</a>";
+                var result = await _mailService.SendMail(email, "Verify your email", content);
                 return result;
             }
             catch (Exception ex)
@@ -189,6 +190,7 @@ namespace Homee.BusinessLayer.Services
                 {
                     return new HomeeResult(Const.FAIL_CREATE_CODE, "This email is already used.");
                 }
+                var token = Guid.NewGuid().ToString() + DateTime.Now.Ticks;
                 var account = new Account
                 {
                     Email = model.Email,
@@ -198,11 +200,15 @@ namespace Homee.BusinessLayer.Services
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
                     Role = 0,
-                    IsBlock = false
+                    IsBlock = false,
+                    VerificationToken = token,
                 };
-                SupportingFeature.SetValueToSession("user", account, context);
 
-                var result = await SendOtp(model.Email, context);
+                _repo.Insert(account);
+
+                _repo.SaveChanges();
+
+                var result = await SendOtp(model.Email, context, token);
 
                 return result.Status > 0 ? new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG) : new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
             }
@@ -287,7 +293,6 @@ namespace Homee.BusinessLayer.Services
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -301,14 +306,11 @@ namespace Homee.BusinessLayer.Services
                 {
                     return new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);
                 }
-
-                result.UpdatedAt = DateTime.Now;
-                result.Password = model.Password;
-                result.ImageUrl = model.ImageUrl;
-                result.Name = model.Name;
-                result.Phone = model.Phone;
-                result.CitizenId = model.CitizenId;
-                result.BirthDay = model.BirthDay;
+                
+                int role = result.Role;
+                result = _mapper.Map<Account>(model);
+                result.Role = role;
+                result.AccountId = id;
 
                 _repo.Update(result);
                 var check = await _repo.SaveChangesAsync();

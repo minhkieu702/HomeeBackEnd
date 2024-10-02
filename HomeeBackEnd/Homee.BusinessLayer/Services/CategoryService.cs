@@ -49,7 +49,7 @@ namespace Homee.BusinessLayer.Services
             try
             {
                 var result = _categoryRepository.GetCategories();
-                return result.Count() <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(_mapper.Map<CategoryResponse>));
+                return result.Count() <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result);
             }
             catch (Exception ex)
             {
@@ -62,7 +62,7 @@ namespace Homee.BusinessLayer.Services
             try
             {
                 var result = _categoryRepository.GetCategory(categoryId);
-                return result == null ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, _mapper.Map<CategoryResponse>(result));
+                return result == null ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result);
             }
             catch (Exception ex)
             {
@@ -74,16 +74,15 @@ namespace Homee.BusinessLayer.Services
         {
             try
             {
-                var result = _categoryRepository.GetCategories();
+                var result = _categoryRepository.GetAll(c => c.CategoryName.ToUpper().Trim().Equals(categoryName.ToUpper().Trim()));
                 if (result.Count() == 0)
                 {
                     return new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
                 }
-                var cates = result.Where(c => c.CategoryName.ToUpper().Trim().Equals(categoryName.ToUpper().Trim()));
                 
-                return cates == null ? 
+                return result == null ? 
                     new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : 
-                    new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(_mapper.Map<CategoryResponse>));
+                    new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result);
             }
             catch (Exception ex)
             {

@@ -17,7 +17,7 @@ namespace Homee.BusinessLayer.IServices
         Task<IHomeeResult> Update(int id, OrderRequest model);
         Task<IHomeeResult>Create(int model);
         Task<IHomeeResult> Delete(int id);
-        Task<IHomeeResult> ExecutePayment(ReturnUrlRequest result, ClaimsPrincipal user);
+        Task<IHomeeResult> ExecutePayment(PAYOS_RETURN_URLRequest result, ClaimsPrincipal user);
         Task<IHomeeResult> GetByCurrentUser(ClaimsPrincipal user);
     }
 }
