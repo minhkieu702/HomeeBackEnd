@@ -26,7 +26,7 @@ namespace Homee.DataLayer.RequestModels
 
         public int? InteriorStatus { get; set; }
 
-        public bool? RentalStatus { get; set; }
+        public bool? IsRented { get; set; }
 
         public decimal? RentAmount { get; set; }
 

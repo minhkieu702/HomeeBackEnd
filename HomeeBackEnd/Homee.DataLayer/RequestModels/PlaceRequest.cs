@@ -20,16 +20,6 @@ namespace Homee.DataLayer.RequestModels
 
         public string Number { get; set; } = null!;
 
-        public double Area { get; set; }
-
-        public int Direction { get; set; }
-
-        public int NumberOfToilet { get; set; }
-
-        public int NumberOfBedroom { get; set; }
-
-        public double Rent { get; set; }
-
         public List<int> Categories { get; set; } = [];        
     }
 }

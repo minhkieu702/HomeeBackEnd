@@ -15,7 +15,7 @@ public partial class Room
 
     public int? InteriorStatus { get; set; }
 
-    public bool? RentalStatus { get; set; }
+    public bool? IsRented { get; set; }
 
     public decimal? RentAmount { get; set; }
 
@@ -26,6 +26,10 @@ public partial class Room
     public decimal? ServiceAmount { get; set; }
 
     public int? PlaceId { get; set; }
+
+    public int? Type { get; set; }
+
+    public bool? IsBlock { get; set; }
 
     public virtual Place? Place { get; set; }
 
