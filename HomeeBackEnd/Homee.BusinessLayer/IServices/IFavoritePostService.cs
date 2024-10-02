@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +17,6 @@ namespace Homee.BusinessLayer.IServices
         Task<IHomeeResult> GetById(int id);
         Task<IHomeeResult> Create(FavoritePostRequest model);
         Task<IHomeeResult> Delete(int id);
-        Task<IHomeeResult> GetByCurrentUser(HttpContext context);
+        Task<IHomeeResult> GetByCurrentUser(ClaimsPrincipal context);
     }
 }
