@@ -9,6 +9,6 @@ namespace Homee.DataLayer.RequestModels
     public class ImageRequest
     {
         public string ImageUrl { get; set; } = null!;
-        public int Number { get; set; }
+        public int No { get; set; }
     }
 }

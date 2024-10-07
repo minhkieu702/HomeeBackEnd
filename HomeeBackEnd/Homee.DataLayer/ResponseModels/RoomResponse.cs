@@ -31,12 +31,12 @@ namespace Homee.DataLayer.ResponseModels
 
         public int? PlaceId { get; set; }
 
-        public int? Type { get; set; }
+        public string Type { get; set; }
 
         public bool? IsBlock { get; set; }
 
-        public virtual Place? Place { get; set; }
+        public virtual PlaceResponse? Place { get; set; }
 
-        public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
+        public virtual ICollection<PostResponse> Posts { get; set; } = [];
     }
 }

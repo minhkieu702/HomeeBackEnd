@@ -15,16 +15,18 @@ namespace Homee.DataLayer.ResponseModels
 
         public string? Note { get; set; }
 
-        public int PlaceId { get; set; }
-
         public int Status { get; set; }
 
         public bool IsBlock { get; set; }
+
+        public int? RoomId { get; set; }
+
+        public string? Title { get; set; }
 
         public virtual ICollection<FavoritePostResponse> FavoritePosts { get; set; } = [];
 
         public virtual ICollection<ImageResponse> Images { get; set; } = [];
 
-        public virtual PlaceResponse Place { get; set; } = null!;
+        public virtual RoomResponse? Room { get; set; }
     }
 }

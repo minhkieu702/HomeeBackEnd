@@ -146,7 +146,7 @@ namespace Homee.BusinessLayer.Services
                 {
                     account.LastOrder = account.Orders.Where(c => c.OwnerId == account.AccountId && c.ExpiredAt > DateTime.Now).LastOrDefault();
                 }
-                return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, accounts);
+                return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, accounts.Select(_mapper.Map<AccountResponse>));
             }
             catch (Exception ex)
             {
@@ -228,7 +228,7 @@ namespace Homee.BusinessLayer.Services
                 }
                 var account = _mapper.Map<AccountResponse>(result);
                 account.LastOrder = account.Orders.Where(c => c.OwnerId == account.AccountId && c.ExpiredAt > DateTime.Now).LastOrDefault();
-                return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, account);
+                return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, _mapper.Map < AccountResponse > (account));
             }
             catch (Exception ex)
             {

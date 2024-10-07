@@ -180,7 +180,7 @@ namespace Homee.Repositories.Repositories
                             {
                                 ImageUrl = url.ImageUrl,
                                 PostId = post.PostId,
-                                Number = url.Number,
+                                No = url.No,
                             };
                             _context.Images.Add(img);
                         }
@@ -292,7 +292,7 @@ namespace Homee.Repositories.Repositories
                             _context.Images.Add(new Image
                             {
                                 ImageUrl = newImg.ImageUrl,
-                                Number = newImg.Number,
+                                No = newImg.No,
                                 PostId = id,
                             });
                         }
@@ -301,7 +301,7 @@ namespace Homee.Repositories.Repositories
                     // Update reused images
                     foreach (var item in imgsToReuse)
                     {
-                        item.Number = newImagesDict[item.ImageUrl].Number;
+                        item.No = newImagesDict[item.ImageUrl].No;
                     }
                     #endregion
 

@@ -9,9 +9,23 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text;
 
+var devEnv = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT_DEV");
+var stagingEnv = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT_STAGING");
+var prodEnv = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT_PROD");
+
+string environment = devEnv ?? stagingEnv ?? prodEnv ?? "Production";
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
+{
+    hostingContext.HostingEnvironment.EnvironmentName = environment;
+
+    config.SetBasePath(Directory.GetCurrentDirectory())
+          .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+          .AddJsonFile($"appsettings.{environment}.json", optional: true)
+          .AddEnvironmentVariables();
+});
 
 builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve);

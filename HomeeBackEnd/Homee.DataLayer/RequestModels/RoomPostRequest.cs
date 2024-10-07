@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Homee.DataLayer.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,15 +27,18 @@ namespace Homee.DataLayer.RequestModels
 
         public decimal? ServiceAmount { get; set; }
 
+        public int? PlaceId { get; set; }
+
+        public int Type { get; set; }
+
         public DateTime PostedDate { get; set; }
 
         public string? Note { get; set; }
 
-        public int RoomId { get; set; }
         public string? Title { get; set; }
 
         public int Status { get; set; }
 
-        public List<string> ImageUrls { get; set; } = [];
+        public List<ImageRequest> ImageUrls { get; set; } = [];
     }
 }

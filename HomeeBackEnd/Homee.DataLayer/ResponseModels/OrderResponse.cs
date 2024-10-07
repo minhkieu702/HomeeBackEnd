@@ -19,8 +19,8 @@ namespace Homee.DataLayer.ResponseModels
 
         public DateTime SubscribedAt { get; set; }
 
-        public virtual Account Owner { get; set; } = null!;
+        public virtual AccountResponse Owner { get; set; } = null!;
 
-        public virtual Subscription Subscription { get; set; } = null!;
+        public virtual SubscriptionResponse Subscription { get; set; } = null!;
     }
 }

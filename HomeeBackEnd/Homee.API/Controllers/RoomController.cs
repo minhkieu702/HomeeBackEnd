@@ -156,7 +156,7 @@ namespace Homee.API.Controllers
 
                     await transaction.CommitAsync();
 
-                    return Ok(new HomeeResult(Const.SUCCESS_UPDATE_CODE, Const.SUCCESS_UPDATE_MSG, room));
+                    return Ok(new HomeeResult(Const.SUCCESS_UPDATE_CODE, Const.SUCCESS_UPDATE_MSG, _mapper.Map<RoomResponse>(room)));
                 }
                 catch (Exception ex)
                 {

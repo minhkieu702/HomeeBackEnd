@@ -101,7 +101,7 @@ namespace Homee.BusinessLayer.Services
                 return new HomeeResult(Const.WARNING_NO_DATA_CODE, "You must login first!");
                 
                 var posts = await _repo.GetPosts();
-                return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, posts);
+                return new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, posts.Select(_mapper.Map<PostResponse>));
             }
             catch (Exception ex)
             {
@@ -155,11 +155,6 @@ namespace Homee.BusinessLayer.Services
             {
                 return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
             }
-        }
-
-        public async Task<IHomeeResult> CreateBasedOnPlace(ClaimsPrincipal claims, RoomPostRequest model)
-        {
-            throw new NotImplementedException();
         }
     }
 }

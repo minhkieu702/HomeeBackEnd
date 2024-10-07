@@ -43,6 +43,10 @@ public partial class HomeedbContext : DbContext
 
     public virtual DbSet<Subscription> Subscriptions { get; set; }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("workstation id=homeedb.mssql.somee.com;packet size=4096;user id=quangminh_SQLLogin_1;pwd=at22vmjqnq;data source=homeedb.mssql.somee.com;persist security info=False;initial catalog=homeedb;TrustServerCertificate=True");
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Account>(entity =>
@@ -152,6 +156,7 @@ public partial class HomeedbContext : DbContext
             entity.ToTable("Image");
 
             entity.Property(e => e.ImageUrl).HasMaxLength(255);
+            entity.Property(e => e.No).HasColumnName("NO");
 
             entity.HasOne(d => d.Post).WithMany(p => p.Images)
                 .HasForeignKey(d => d.PostId)

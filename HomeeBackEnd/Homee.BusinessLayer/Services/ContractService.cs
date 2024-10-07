@@ -70,7 +70,7 @@ namespace Homee.BusinessLayer.Services
             try
             {
                 var result = _repo.GetContracts();
-                return result.Count() <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result);
+                return result.Count() <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(_mapper.Map<ContractResponse>));
             }
             catch (Exception ex)
             {
@@ -83,7 +83,7 @@ namespace Homee.BusinessLayer.Services
             try
             {
                 var result = _repo.GetContract(id);
-                return result == null ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result);
+                return result == null ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, _mapper.Map<ContractResponse>(result));
             }
             catch (Exception ex)
             {
@@ -121,7 +121,7 @@ namespace Homee.BusinessLayer.Services
             try
             {
                 var result = _repo.GetContractByCurrentUser(user);
-                return result == null || result.Count <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result);
+                return result == null || result.Count <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(_mapper.Map<ContractResponse>));
             }
             catch (Exception ex)
             {

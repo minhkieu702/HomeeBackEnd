@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Homee.DataLayer.ResponseModels;
 using System.Security.Claims;
+using Homee.BusinessLayer.Helpers;
 
 namespace Homee.BusinessLayer.Services
 {
@@ -59,9 +60,22 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
-        public Task<IHomeeResult> GetByCurrentUser(ClaimsPrincipal user)
+        public async Task<IHomeeResult> GetByCurrentUser(ClaimsPrincipal claims)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var userId = claims.FindFirst(ClaimTypes.NameIdentifier);
+                if (userId == null || !int. TryParse(userId.Value, out int uid))
+                {
+                    return new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
+                }
+                var result = _repo.GetAll(c => c.OwnerId == uid).IncludeAll();
+                return result.Count() <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(_mapper.Map<PlaceResponse>));
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
         }
 
         public async Task<IHomeeResult> GetById(int id)
