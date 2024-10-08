@@ -31,6 +31,6 @@ namespace Homee.API.Controllers
         public IActionResult Update(int id, [FromBody] ContractRequest contract) => Ok(_service.Update(id, contract).Result);
 
         [HttpDelete("Delete/{id}")]
-        public IActionResult Block(int id) => Ok(_service.Delete(id).Result);
+        public IActionResult Delete(int id) => Ok(_service.Delete(id).Result);
     }
 }

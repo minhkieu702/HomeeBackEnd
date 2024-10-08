@@ -19,7 +19,7 @@ namespace Homee.API.Controllers
         }
 
         [HttpPost("Create")]
-        public IActionResult Create([FromBody] PlaceRequest category) => Ok(_placeService.Insert(category, User).Result);
+        public IActionResult Create([FromBody] PlaceRequest place) => Ok(_placeService.Insert(place, User).Result);
 
         [HttpGet("GetAll")]
         public IActionResult GetAll() => Ok(_placeService.GetAll().Result);
@@ -28,7 +28,7 @@ namespace Homee.API.Controllers
         public IActionResult GetById(int id) => Ok(_placeService.GetById(id).Result);
 
         [HttpPut("Update/{id}")]
-        public IActionResult Update(int id, [FromBody] PlaceRequest category) => Ok(_placeService.Update(id, category, User).Result);
+        public IActionResult Update(int id, [FromBody] PlaceRequest place) => Ok(_placeService.Update(id, place, User).Result);
 
         [HttpPatch("Block/{id}")]
         public IActionResult Block(int id) => Ok(_placeService.Block(id).Result);

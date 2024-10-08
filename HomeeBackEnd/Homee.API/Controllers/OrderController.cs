@@ -35,10 +35,10 @@ namespace Homee.API.Controllers
         public IActionResult GetByCurrentUser() => Ok(_service.GetByCurrentUser(User).Result);
 
         [HttpPut("Update/{id}")]
-        public IActionResult Update(int id, [FromBody] OrderRequest category) => Ok(_service.Update(id, category).Result);
+        public IActionResult Update(int id, [FromBody] OrderRequest order) => Ok(_service.Update(id, order).Result);
 
         [HttpDelete("Delete/{id}")]
-        public IActionResult Block(int id) => Ok(_service.Delete(id).Result);
+        public IActionResult Delete(int id) => Ok(_service.Delete(id).Result);
 
         //code=00&id=2e4acf1083304877bf1a8c108b30cccd&cancel=true&status=CANCELLED&orderCode=803347
         [HttpGet("return-url")]

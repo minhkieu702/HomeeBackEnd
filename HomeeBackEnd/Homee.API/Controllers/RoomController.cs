@@ -45,11 +45,11 @@ namespace Homee.API.Controllers
         }
 
         [HttpGet("RoomsByPlaceId")]
-        public async Task<IActionResult> GetRoomByPlaceId(int id)
+        public async Task<IActionResult> GetRoomByPlaceId(int placeId)
         {
             try
             {
-                var result = await _context.Rooms.Where(p => p.PlaceId == id).IncludeAll().ToListAsync();
+                var result = await _context.Rooms.Where(p => p.PlaceId == placeId).IncludeAll().ToListAsync();
                 return result.Count == 0 ? NotFound(new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG)) : Ok(new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(_mapper.Map<RoomResponse>)));
             }
             catch (Exception ex)
@@ -79,10 +79,10 @@ namespace Homee.API.Controllers
             {
                 try
                 {
-                    var room = await _context.Rooms.IncludeAll().FirstOrDefaultAsync(c => c.RoomName.ToUpper().Equals(model.RoomName.ToUpper()));
-                    if (room != null) return BadRequest(new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG));
-
-                    await _context.Rooms.AddAsync(_mapper.Map<Room>(model));
+                    var room = await _context.Rooms.FirstOrDefaultAsync(c => c.RoomName.ToUpper().Equals(model.RoomName.ToUpper()));
+                    if (room != null) return BadRequest(new HomeeResult(Const.FAIL_CREATE_CODE, "This room's name has already used"));
+                    room = _mapper.Map<Room>(model);
+                    await _context.Rooms.AddAsync(room);
                     var check = await _context.SaveChangesAsync();
                     if (check <= 0)
                     {
@@ -134,7 +134,7 @@ namespace Homee.API.Controllers
             }
         }
 
-        [HttpPost("Edit/{id}")]
+        [HttpPut("Edit/{id}")]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] RoomRequest model)
         {
             using(var transaction = await _context.Database.BeginTransactionAsync())

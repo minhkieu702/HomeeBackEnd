@@ -31,20 +31,20 @@ namespace Homee.API.Controllers
         /// </summary>
         /// <param name="post"></param>
         /// <returns></returns>
-        [Authorize]
         [HttpPost("CreateBaseOnRoom")]
         public IActionResult Create([FromBody] PostRequest post) => Ok(_service.Create(post).Result);
-        [Authorize]
         [HttpGet("GetAll")]
         public IActionResult GetAll() => Ok(_service.GetAll().Result);
 
+        [Authorize]
         [HttpGet("GetByAccountId")]
         public IActionResult GetByAccountId() => Ok(_service.GetByCurrentUser(User).Result);
+        
         [HttpGet("GetById/{id}")]
         public IActionResult GetById(int id) => Ok(_service.GetById(id).Result);
         
         /// <summary>
-        /// update post base on existed room
+        /// update only post
         /// </summary>
         /// <param name="id"></param>
         /// <param name="post"></param>
@@ -64,7 +64,13 @@ namespace Homee.API.Controllers
         [Authorize]
         public IActionResult Publish([FromBody] PlacePostRequest model) => Ok(_service.PublishPost(model, User).Result);
 
-        [HttpPost("Update")]
+        /// <summary>
+        /// update place room post 
+        /// </summary>
+        /// <param name="postId"></param>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPut("Update")]
         public IActionResult Update(int postId, [FromBody] PlacePostRequest model) => Ok(_service.UpdatePlacePost(postId, model).Result);
 
         [HttpPost("CreateBasedOnPlace")]
