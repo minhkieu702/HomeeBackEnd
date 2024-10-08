@@ -1,4 +1,5 @@
-﻿using Homee.BusinessLayer.Helpers;
+﻿using AutoMapper;
+using Homee.BusinessLayer.Helpers;
 using Homee.DataLayer.Models;
 using Homee.DataLayer.RequestModels;
 using Homee.Repositories.IRepositories;
@@ -15,12 +16,14 @@ namespace Homee.Repositories.Repositories
 {
     public class PostRepository : BaseRepository<Post>, IPostRepository
     {
+        private readonly IMapper _mapper;
         private readonly HomeedbContext _context;
 
         public PostRepository() { }
 
-        public PostRepository(HomeedbContext context)
+        public PostRepository(HomeedbContext context, IMapper mapper)
         {
+            _mapper = mapper;
             _context = context;
         }
 
@@ -86,15 +89,22 @@ namespace Homee.Repositories.Repositories
 
         public async Task<Post> GetPostById(int id)
         {
-            var post = await _context.Posts.IncludeAll()
+            var post = await _context.Posts.Include(c => c.Room).ThenInclude(c => c.Place).ThenInclude(c => c.Owner)
                 .FirstOrDefaultAsync(c => c.PostId == id);
             return post;
         }
 
         public async Task<IList<Post>> GetPosts()
         {
-            var posts = await _context.Posts.IncludeAll()
+            var posts = await _context.Posts.Include(c => c.Room).ThenInclude(c => c.Place).ThenInclude(c => c.Owner)
                 .ToListAsync();
+            return posts;
+        }
+
+        public async Task<IEnumerable<object>> GetPosts(ClaimsPrincipal user)
+        {
+            var aId = user.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var posts = _context.Posts.Include(c => c.Room).ThenInclude(c => c.Place).Where(c => c.Room.Place.OwnerId == int.Parse(aId)).ToList();
             return posts;
         }
 
@@ -122,17 +132,6 @@ namespace Homee.Repositories.Repositories
                     await _context.Places.AddAsync(place);
                     var check = await _context.SaveChangesAsync();
                     if (check <= 0) transaction.Rollback();
-                    #endregion
-
-                    #region Insert Category_Place
-                    foreach (var cid in model.Categories)
-                    {
-                        var cate = _context.Categories.FirstOrDefault(c => c.CategoryId == cid);
-                        if (cate != null)
-                        {
-                            _context.CategoryPlaces.Add(new CategoryPlace { CategoryId = cid, PlaceId = place.PlaceId });
-                        }
-                    }
                     #endregion
 
                     #region Insert Room
@@ -187,8 +186,7 @@ namespace Homee.Repositories.Repositories
                     }
                     #endregion
 
-                    if (model.Categories != null && model.Categories.Count > 0 ||
-                        model.ImageUrls != null && model.ImageUrls.Count > 0)
+                    if (model.ImageUrls != null && model.ImageUrls.Count > 0)
                     {
                         check = await _context.SaveChangesAsync();
                         if (check <= 0) transaction.Rollback();
@@ -335,27 +333,6 @@ namespace Homee.Repositories.Repositories
                     _context.Places.Update(place);
                     #endregion
 
-                    #region Update Category_Place
-                    var cates = _context.CategoryPlaces.Where(c => c.PlaceId == place.PlaceId).ToList();
-
-                    var catesToDelete = cates.Where(c => !model.Categories.Contains(c.CategoryId)).ToList();
-                    var storedCates = cates.Select(c => c.CategoryId).ToList();
-                    var catesToAdd = model.Categories.Where(c => !storedCates.Contains(c)).ToList();
-
-                    if (catesToDelete != null && catesToDelete.Count > 0)
-                    {
-                        _context.CategoryPlaces.RemoveRange(catesToDelete);
-                    }
-
-                    if (catesToAdd != null && catesToAdd.Count > 0)
-                    {
-                        foreach (var cateToAdd in catesToAdd)
-                        {
-                            _context.CategoryPlaces.Add(new CategoryPlace { CategoryId = cateToAdd, PlaceId = place.PlaceId });
-                        }
-                    }
-                    #endregion
-
                     var check = await _context.SaveChangesAsync();
                     if (check <= 0)
                     {
@@ -375,6 +352,23 @@ namespace Homee.Repositories.Repositories
 
         public async Task<int> UpdatePost(int id, PostRequest model)
         {
+            try
+            {
+                var post = _context.Posts.FirstOrDefault(c => c.PostId == id);
+                if (post == null)
+                {
+                    return 0;
+                }
+                _mapper.Map(model, post);
+                _context.Posts.Update(post);
+                var check = _context.SaveChanges();
+                return check;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
             return 0;
         }
     }

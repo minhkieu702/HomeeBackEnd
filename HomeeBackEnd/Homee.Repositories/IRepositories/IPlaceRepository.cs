@@ -16,6 +16,6 @@ namespace Homee.Repositories.IRepositories
         Place GetPlace(int id);
         List<Place> GetPlaces();
         Task<int> InsertPlace(PlaceRequest place, ClaimsPrincipal user);
-        Task<int> UpdatePlace(Place oldPlace, PlaceRequest newPlace, ClaimsPrincipal user);
+        Task<int> UpdatePlace(int id, PlaceRequest newPlace, ClaimsPrincipal user);
     }
 }

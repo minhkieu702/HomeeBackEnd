@@ -1,4 +1,5 @@
-﻿using Homee.BusinessLayer.Helpers;
+﻿using AutoMapper;
+using Homee.BusinessLayer.Helpers;
 using Homee.DataLayer.Models;
 using Homee.DataLayer.RequestModels;
 using Homee.Repositories.IRepositories;
@@ -16,14 +17,16 @@ namespace Homee.Repositories.Repositories
 {
     public class PlaceRepository : BaseRepository<Place>, IPlaceRepository
     {
+        private readonly IMapper _mapper;
         private readonly HomeedbContext _context;
 
         public PlaceRepository()
         {
 
         }
-        public PlaceRepository(HomeedbContext context)
+        public PlaceRepository(HomeedbContext context, IMapper mapper)
         {
+            _mapper = mapper;
             _context = context;
         }
         public async Task<bool> CanInsert(PlaceRequest model)
@@ -65,50 +68,18 @@ namespace Homee.Repositories.Repositories
                 try
                 {
 
-                    var place = new Place
-                    {
-                        Province = model.Province,
-                        Ward = model.Ward,
-                        Number = model.Number,
-                        Street = model.Street,
-                        Distinct = model.Distinct,
-                        OwnerId = GetUserId(user)
-                    };
+                    var place = _mapper.Map<Place>(model);
+                    place.OwnerId = GetUserId(user);
 
                     // Add the Place entity to the context
                     _context.Places.Add(place);
+
                     var check = await _context.SaveChangesAsync();
                     if (check <= 0)
                     {
                         transaction.Rollback();
                     }
-
-                    var flag1 = false;
-                    var flag2 = false;
-
-                    foreach (var cid in model.Categories)
-                    {
-                        var cate = _context.Categories.FirstOrDefault(c => c.CategoryId == cid);
-                        if (cate != null)
-                        {
-                            _context.CategoryPlaces.Add(new CategoryPlace { CategoryId = cid, PlaceId = place.PlaceId });
-                            flag1 = true;
-                        }
-                    }
-
-
-                    if (flag1 || flag2)
-                    {
-                        check = await _context.SaveChangesAsync();
-                        if (check <= 0)
-                        {
-                            transaction.Rollback();
-                        }
-                    }
-                    if (check > 0)
-                    {
-                        transaction.Commit();
-                    }
+                    transaction.Commit();
                     return check;
                 }
                 catch (Exception)
@@ -118,47 +89,19 @@ namespace Homee.Repositories.Repositories
                 }
             }
         }
-        public async Task<int> UpdatePlace(Place oldPlace, PlaceRequest newPlace, ClaimsPrincipal user)
+        public async Task<int> UpdatePlace(int id, PlaceRequest newPlace, ClaimsPrincipal user)
         {
             using (var transaction = _context.Database.BeginTransaction())
             {
                 try
                 {
-                    var place = new Place
-                    {
-                        IsBlock = oldPlace.IsBlock,
-                        PlaceId = oldPlace.PlaceId,
-                        Province = newPlace.Province,
-                        Ward = newPlace.Ward,
-                        Number = newPlace.Number,
-                        Street = newPlace.Street,
-                        Distinct = newPlace.Distinct,
-                        OwnerId = GetUserId(user)
-                    };
-                    oldPlace = place;
-                    _context.Places.Update(oldPlace);
+                    var oldPlace = _context.Places.FirstOrDefault(p => p.PlaceId == id);
+                    var place = _mapper.Map(newPlace, oldPlace);
+                    _context.Places.Update(place);
                     var check = await _context.SaveChangesAsync();
                     if (check <= 0)
                     {
                         transaction.Rollback();
-                    }
-                    bool flag = false;
-                    foreach (var cid in newPlace.Categories)
-                    {
-                        var cate = _context.Categories.FirstOrDefault(c => c.CategoryId == cid);
-                        if (cate != null)
-                        {
-                            _context.CategoryPlaces.Add(new CategoryPlace { CategoryId = cid, PlaceId = place.PlaceId });
-                            flag = true;
-                        }
-                    }
-                    if (flag)
-                    {
-                        check = await _context.SaveChangesAsync();
-                        if (check <= 0)
-                        {
-                            transaction.Rollback();
-                        }
                     }
                     if (check > 0)
                     {

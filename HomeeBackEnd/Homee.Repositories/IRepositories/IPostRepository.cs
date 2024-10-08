@@ -18,5 +18,6 @@ namespace Homee.Repositories.IRepositories
         Task<bool> CanInsert(PlacePostRequest model);
         Task<int> UpdatePost(int id, PostRequest model);
         Task<int> UpdatePlacePost(int id, PlacePostRequest model);
+        Task<IEnumerable<object>> GetPosts(ClaimsPrincipal user);
     }
 }
