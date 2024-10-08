@@ -38,7 +38,7 @@ namespace Homee.API.Controllers
         [HttpPut("Update/{id}")]
         public IActionResult Update(int id, [FromBody] AccountRequest account) => Ok(_service.Update(id, account).Result);
 
-        [HttpDelete("Delete/{id}")]
+        [HttpPatch("Block/{id}")]
         public IActionResult Block(int id) => Ok(_service.Block(id).Result);
     }
 }

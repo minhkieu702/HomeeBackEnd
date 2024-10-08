@@ -14,7 +14,6 @@ namespace Homee.API.AppStart
             services.AddTransient(typeof(HomeedbContext), typeof(HomeedbContext));
 
             services.AddScoped<IAccountService, AccountService>();
-            services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IPlaceService, PlaceService>();
             services.AddScoped<IContractService, ContractService>();
             services.AddScoped<IFavoritePostService, FavoritePostService>();
@@ -25,7 +24,6 @@ namespace Homee.API.AppStart
             services.AddScoped<IMailService, MailService>();
 
             services.AddScoped<IAccountRepository, AccountRepository>();
-            services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IPlaceRepository, PlaceRepository>();
             services.AddScoped<IContractRepository, ContractRepository>();
             services.AddScoped<IFavoritePostRepository, FavoritePostRepository>();

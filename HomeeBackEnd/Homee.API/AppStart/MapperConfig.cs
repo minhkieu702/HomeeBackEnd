@@ -14,11 +14,6 @@ namespace Homee.API.AppStart
             CreateMap<Account, AccountRequest>().ReverseMap();
             CreateMap<AccountResponse, Account>().ReverseMap();
             #endregion
-            
-            #region Category
-            CreateMap<CategoryRequest, Category>().ReverseMap();
-            CreateMap<CategoryResponse, Category>().ReverseMap();
-            #endregion
 
             #region Contract
             CreateMap<Contract, ContractRequest>().ReverseMap();
@@ -41,17 +36,13 @@ namespace Homee.API.AppStart
             #endregion
 
             #region Place
-            CreateMap<Place, PlaceResponse>()
-                //.ForMember(dest => dest.Direction, opt => opt.MapFrom(src => ((PlaceDirection)src.Direction).ToString()))
-                .ReverseMap();
-            CreateMap<PlaceRequest, Place>().ReverseMap();
+            CreateMap<Place, PlaceResponse>();
+            CreateMap<PlaceRequest, Place>();
             #endregion
 
             #region Room
             CreateMap<RoomRequest, Room>()
-                .ForMember(dest => dest.RoomId, opt => opt.Ignore())
-                .ForMember(dest => dest.Place, opt => opt.Ignore())
-                .ForMember(dest => dest.Posts, opt => opt.Ignore());
+                .ForMember(c => c.PlaceId, opt => opt.Condition((src, dest, srcmember) => dest.RoomId == 0));
             CreateMap<Room, RoomResponse>()
                 .AfterMap((src, dest) =>
                 {
@@ -92,17 +83,14 @@ namespace Homee.API.AppStart
             #endregion
 
             #region Post
-            CreateMap<Post, PostRequest>().ReverseMap();
+            CreateMap<PostRequest, Post>()
+                .ForMember(c => c.RoomId, opt => opt.Condition((src, dest, srcMember)=>dest.RoomId == 0));
             CreateMap<PostResponse, Post>().ReverseMap();
             #endregion
 
             #region Subscription
             CreateMap<Subscription, SubscriptionRequest>().ReverseMap();
             CreateMap<Subscription, SubscriptionResponse>().ReverseMap();
-            #endregion
-
-            #region CategoryPlace
-            CreateMap<CategoryPlace, CategoryPlaceResponse>().ReverseMap();
             #endregion
 
             #region Room Post
@@ -136,6 +124,7 @@ namespace Homee.API.AppStart
 
             #region Image
             CreateMap<ImageRequest, Image>();
+            CreateMap<Image, ImageResponse>();
             #endregion
         }
     }
