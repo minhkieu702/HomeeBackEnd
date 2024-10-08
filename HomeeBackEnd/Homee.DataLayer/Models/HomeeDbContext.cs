@@ -19,10 +19,6 @@ public partial class HomeedbContext : DbContext
 
     public virtual DbSet<Box> Boxes { get; set; }
 
-    public virtual DbSet<Category> Categories { get; set; }
-
-    public virtual DbSet<CategoryPlace> CategoryPlaces { get; set; }
-
     public virtual DbSet<Contract> Contracts { get; set; }
 
     public virtual DbSet<FavoritePost> FavoritePosts { get; set; }
@@ -83,32 +79,6 @@ public partial class HomeedbContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-        });
-
-        modelBuilder.Entity<Category>(entity =>
-        {
-            entity.HasKey(e => e.CategoryId).HasName("PK__Category__19093A0B8D99E1F3");
-
-            entity.ToTable("Category");
-
-            entity.Property(e => e.CategoryName).HasMaxLength(250);
-        });
-
-        modelBuilder.Entity<CategoryPlace>(entity =>
-        {
-            entity.HasKey(e => e.CategoryPlaceId).HasName("PK__Category__C882A4EB99D5600E");
-
-            entity.ToTable("CategoryPlace");
-
-            entity.HasOne(d => d.Category).WithMany(p => p.CategoryPlaces)
-                .HasForeignKey(d => d.CategoryId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_CategoryPlace_Category");
-
-            entity.HasOne(d => d.Place).WithMany(p => p.CategoryPlaces)
-                .HasForeignKey(d => d.PlaceId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_CategoryPlace_Place");
         });
 
         modelBuilder.Entity<Contract>(entity =>
