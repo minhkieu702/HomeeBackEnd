@@ -31,7 +31,7 @@ namespace Homee.DataLayer.ResponseModels
 
         public int? PlaceId { get; set; }
 
-        public string Type { get; set; }
+        public string? Type { get; set; }
 
         public bool? IsBlock { get; set; }
 
