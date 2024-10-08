@@ -19,7 +19,5 @@ namespace Homee.DataLayer.RequestModels
         public string Street { get; set; } = null!;
 
         public string Number { get; set; } = null!;
-
-        public List<int> Categories { get; set; } = [];        
     }
 }
