@@ -99,7 +99,7 @@ namespace Homee.BusinessLayer.Services
             {
                 var aid = user.FindFirst(ClaimTypes.NameIdentifier).Value;
                 var orders = _repo.GetAll(c => c.OwnerId == int.Parse(aid));
-                return orders.Count() <= 0 ? new HomeeResult(Const.FAIL_READ_CODE, Const.FAIL_READ_MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, orders.Select(_mappper.Map<OrderResponse>));
+                return orders.Count() <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, orders.Select(_mappper.Map<OrderResponse>));
             }
             catch (Exception ex)
             {

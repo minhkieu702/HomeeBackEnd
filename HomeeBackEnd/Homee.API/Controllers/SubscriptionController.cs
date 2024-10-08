@@ -28,7 +28,7 @@ namespace Homee.API.Controllers
         public IActionResult GetById(int id) => Ok(_service.GetById(id).Result);
 
         [HttpPut("Update/{id}")]
-        public IActionResult Update(int id, [FromBody] SubscriptionRequest category) => Ok(_service.Update(id, category).Result);
+        public IActionResult Update(int id, [FromBody] SubscriptionRequest subscription) => Ok(_service.Update(id, subscription).Result);
 
         [HttpDelete("Delete/{id}")]
         public IActionResult Delete(int id) => Ok(_service.Delete(id).Result);

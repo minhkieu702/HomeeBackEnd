@@ -121,7 +121,7 @@ namespace Homee.BusinessLayer.Services
                 {
                     return new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);
                 }
-                var check = await _repo.UpdatePlace(result, model, user);
+                var check = await _repo.UpdatePlace(id, model, user);
                 return check > 0 ?
                     new HomeeResult(Const.SUCCESS_UPDATE_CODE, Const.SUCCESS_UPDATE_MSG) :
                     new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);
