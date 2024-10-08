@@ -21,22 +21,14 @@ namespace Homee.DataLayer.ResponseModels
 
         public string Number { get; set; } = null!;
 
-        public double Area { get; set; }
-
-        public string  Direction { get; set; }
-
-        public int NumberOfToilet { get; set; }
-
-        public int NumberOfBedroom { get; set; }
-
-        public double Rent { get; set; }
-
         public int OwnerId { get; set; }
 
         public bool? IsBlock { get; set; }
 
         public virtual AccountResponse Owner { get; set; } = null!;
 
-        public virtual ICollection<CategoryPlaceResponse> CategoryPlaces { get; set; } = new List<CategoryPlaceResponse>();
+        public virtual ICollection<ContractResponse> Contracts { get; set; } = [];
+
+        public virtual ICollection<RoomResponse> Rooms { get; set; } = [];
     }
 }

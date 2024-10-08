@@ -15,7 +15,7 @@ namespace Homee.DataLayer.RequestModels
         public decimal? Area { get; set; }
 
         public int? InteriorStatus { get; set; }
-
+        public int Type { get; set; }
         public bool? IsRented { get; set; }
 
         public decimal? RentAmount { get; set; }
@@ -25,5 +25,7 @@ namespace Homee.DataLayer.RequestModels
         public decimal? ElectricAmount { get; set; }
 
         public decimal? ServiceAmount { get; set; }
+
+        public int PlaceId { get; set; }
     }
 }

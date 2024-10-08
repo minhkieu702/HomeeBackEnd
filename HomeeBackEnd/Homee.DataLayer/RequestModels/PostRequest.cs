@@ -19,6 +19,6 @@ namespace Homee.DataLayer.RequestModels
 
         public int Status { get; set; }
 
-        public List<string> ImageUrls { get; set; } = [];
+        public List<ImageRequest> ImageUrls { get; set; } = [];
     }
 }
