@@ -89,14 +89,14 @@ namespace Homee.Repositories.Repositories
 
         public async Task<Post> GetPostById(int id)
         {
-            var post = await _context.Posts.Include(c => c.Room).ThenInclude(c => c.Place).ThenInclude(c => c.Owner)
+            var post = await _context.Posts.Include(c => c.Room).ThenInclude(c => c.Place).ThenInclude(c => c.Owner).Include(c => c.Images)
                 .FirstOrDefaultAsync(c => c.PostId == id);
             return post;
         }
 
         public async Task<IList<Post>> GetPosts()
         {
-            var posts = await _context.Posts.Include(c => c.Room).ThenInclude(c => c.Place).ThenInclude(c => c.Owner)
+            var posts = await _context.Posts.Include(c => c.Room).ThenInclude(c => c.Place).ThenInclude(c => c.Owner).Include(c => c.Images)
                 .ToListAsync();
             return posts;
         }

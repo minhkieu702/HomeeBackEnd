@@ -14,7 +14,5 @@ namespace Homee.DataLayer.ResponseModels
         public string ImageUrl { get; set; } = null!;
 
         public int PostId { get; set; }
-
-        public virtual PostResponse Post { get; set; } = null!;
     }
 }
