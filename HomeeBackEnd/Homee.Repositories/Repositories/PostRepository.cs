@@ -117,16 +117,9 @@ namespace Homee.Repositories.Repositories
                     var aId = user.FindFirst(ClaimTypes.NameIdentifier).Value;
 
                     #region Insert Place
-                    var place = new Place
-                    {
-                        Province = model.Province,
-                        Ward = model.Ward,
-                        Number = model.Number,
-                        Street = model.Street,
-                        Distinct = model.Distinct,
-                        OwnerId = int.Parse(aId.ToString()),
-                        IsBlock = false
-                    };
+                    var place = _mapper.Map<Place>(model);
+                    place.OwnerId = int.Parse(aId);
+                    place.IsBlock = false;
 
                     // Add the Place entity to the context
                     await _context.Places.AddAsync(place);
@@ -135,36 +128,19 @@ namespace Homee.Repositories.Repositories
                     #endregion
 
                     #region Insert Room
-                    var room = new Room
-                    {
-                        RoomName = model.RoomName,
-                        Direction = model.Direction,
-                        Area = model.Area,
-                        InteriorStatus = model.InteriorStatus,
-                        IsRented = model.IsRented,
-                        RentAmount = model.RentAmount,
-                        WaterAmount = model.WaterAmount,
-                        ElectricAmount = model.ElectricAmount,
-                        ServiceAmount = model.ServiceAmount,
-                        PlaceId = place.PlaceId
-                    };
-
+                    var room = _mapper.Map<Room>(model);
+                    room.PlaceId = place.PlaceId;
+                    room.IsBlock = false;
                     await _context.Rooms.AddAsync(room);
                     check = await _context.SaveChangesAsync();
                     if (check <= 0) transaction.Rollback();
                     #endregion
 
                     #region Insert Post
-                    var post = new Post
-                    {
-                        PostedDate = DateTime.Now,
-                        Note = model.Note,
-                        Status = model.Status,
-                        IsBlock = false,
-                        RoomId = room.RoomId,
-                        Title = model.Title,
-                    };
-
+                    var post = _mapper.Map<Post>(model);
+                    post.PostedDate = DateTime.Now;
+                    post.RoomId = room.RoomId;
+                    post.IsBlock = false;
                     await _context.Posts.AddAsync(post);
                     check = await _context.SaveChangesAsync();
                     if (check <= 0) transaction.Rollback();
@@ -213,7 +189,6 @@ namespace Homee.Repositories.Repositories
                     var post = await _context.Posts.FirstOrDefaultAsync(c => c.PostId == id);
                     if (post == null) return 0;
 
-                    post.PostedDate = model.PostedDate;
                     post.Note = model.Note;
                     post.Status = model.Status;
                     post.Title = model.Title;

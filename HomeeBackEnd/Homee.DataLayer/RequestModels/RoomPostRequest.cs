@@ -31,6 +31,10 @@ namespace Homee.DataLayer.RequestModels
 
         public int Type { get; set; }
 
+        public int? RestRoom { get; set; }
+
+        public int? BedRoom { get; set; }
+
         public DateTime PostedDate { get; set; }
 
         public string? Note { get; set; }

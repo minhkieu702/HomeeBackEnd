@@ -126,6 +126,18 @@ namespace Homee.API.AppStart
             CreateMap<ImageRequest, Image>();
             CreateMap<Image, ImageResponse>();
             #endregion
+
+            #region Place Room Post
+            CreateMap<PlacePostRequest, Place>()
+                .ForMember(dest => dest.OwnerId, opt => opt.Ignore())
+                .ForMember(dest => dest.PlaceId, opt => opt.Ignore());
+            CreateMap<PlacePostRequest, Room>()
+                .ForMember(dest => dest.RoomId, opt => opt.Ignore())
+                .ForMember(dest => dest.PlaceId, opt => opt.Ignore());
+            CreateMap<PlacePostRequest, Post>()
+                .ForMember(dest => dest.PostId, opt => opt.Ignore())
+                .ForMember(dest => dest.RoomId, opt => opt.Ignore());
+            #endregion
         }
     }
 }

@@ -35,6 +35,10 @@ namespace Homee.DataLayer.ResponseModels
 
         public bool? IsBlock { get; set; }
 
+        public int? RestRoom { get; set; }
+
+        public int? BedRoom { get; set; }
+
         public virtual PlaceResponse? Place { get; set; }
 
         public virtual ICollection<PostResponse> Posts { get; set; } = [];

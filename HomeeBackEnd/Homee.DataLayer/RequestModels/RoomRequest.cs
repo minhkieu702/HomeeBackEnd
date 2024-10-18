@@ -26,6 +26,10 @@ namespace Homee.DataLayer.RequestModels
 
         public decimal? ServiceAmount { get; set; }
 
+        public int? RestRoom { get; set; }
+
+        public int? BedRoom { get; set; }
+
         public int PlaceId { get; set; }
     }
 }

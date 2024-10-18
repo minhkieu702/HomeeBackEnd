@@ -30,6 +30,7 @@ namespace Homee.BusinessLayer.Services
             try
             {
                 var result = _mapper.Map<Post>(model);
+                result.RoomId = model.RoomId;
                 result.IsBlock = false;
                 await _repo.InsertAsync(result);
                 var check = await _repo.SaveChangesAsync();

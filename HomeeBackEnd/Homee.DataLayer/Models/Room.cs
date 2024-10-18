@@ -31,7 +31,11 @@ public partial class Room
 
     public bool? IsBlock { get; set; }
 
-    public Place? Place { get; set; }
+    public int? RestRoom { get; set; }
+
+    public int? BedRoom { get; set; }
+
+    public virtual Place? Place { get; set; }
 
     public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
 }

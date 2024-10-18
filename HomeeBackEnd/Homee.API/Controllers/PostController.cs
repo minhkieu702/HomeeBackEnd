@@ -32,7 +32,46 @@ namespace Homee.API.Controllers
         /// <param name="post"></param>
         /// <returns></returns>
         [HttpPost("CreateBaseOnRoom")]
-        public IActionResult Create([FromBody] PostRequest post) => Ok(_service.Create(post).Result);
+        public async Task<IActionResult> Create([FromBody] PostRequest post)
+        {
+                using (var transaction = _context.Database.BeginTransaction())
+                {
+                try
+                {
+                    var result = _mapper.Map<Post>(post);
+                    result.RoomId = post.RoomId;
+                    result.IsBlock = false;
+                    result.PostedDate = DateTime.Now;
+                    await _context.Posts.AddAsync(result);
+                    if (_context.SaveChanges() < 1)
+                    {
+                        transaction.Rollback();
+                        return BadRequest(new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG));
+                    }
+                    foreach (var img in post.ImageUrls)
+                    {
+                        await _context.Images.AddAsync(new Image
+                        {
+                            ImageUrl = img.ImageUrl,
+                            No = img.No,
+                            PostId = result.PostId,
+                        });
+                    }
+                    if (_context.SaveChanges() < 1)
+                    {
+                        transaction.Rollback();
+                        return BadRequest(new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG));
+                    }
+                    transaction.Commit();
+                    return Ok(new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG, post ));
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    return BadRequest(new HomeeResult(Const.ERROR_EXCEPTION, ex.Message));
+                }   
+                }
+        }
         [HttpGet("GetAll")]
         public IActionResult GetAll() => Ok(_service.GetAll().Result);
 
