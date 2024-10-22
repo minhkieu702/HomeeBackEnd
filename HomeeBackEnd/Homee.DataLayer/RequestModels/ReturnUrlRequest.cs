@@ -13,5 +13,6 @@ namespace Homee.DataLayer.RequestModels
         public string PaymentId { get; set; }
         public bool Cancel { get; set; }
         public string Status { get; set; }
+        public long OrderCode { get; set; }
     }
 }

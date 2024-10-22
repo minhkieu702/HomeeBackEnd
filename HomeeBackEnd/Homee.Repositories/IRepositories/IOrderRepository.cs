@@ -16,6 +16,7 @@ namespace Homee.Repositories.IRepositories
         List<Order> GetAllOrders();
         Order GetOrder(int id);
         Task<string> CreatePaymentUrl(int subId);
+        Task<string> CreatePaymentUrl();
         Task<int> UpdatePlace(Order result, OrderRequest model);
         Task<int> InsertOrder(PAYOS_RETURN_URLRequest result, ClaimsPrincipal user);
     }

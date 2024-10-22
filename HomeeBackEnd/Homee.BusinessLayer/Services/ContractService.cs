@@ -20,9 +20,10 @@ namespace Homee.BusinessLayer.Services
     {
         private readonly IMapper _mapper;
         private readonly IContractRepository _repo;
-
-        public ContractService(IMapper mapper, IContractRepository repo) 
+        private readonly IAccountRepository _accRepo;
+        public ContractService(IMapper mapper, IContractRepository repo, IAccountRepository accRepo)
         {
+            _accRepo = accRepo;
             _mapper = mapper;
             _repo = repo;
         }
@@ -44,16 +45,25 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
-        public async Task<IHomeeResult> Create(ContractRequest model)
+        public async Task<IHomeeResult> Create(ContractRequest model, ClaimsPrincipal claimsPrincipal)
         {
             try
             {
+                var claim = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier);
+                if (claim == null || string.IsNullOrEmpty(claim.Value) || !int.TryParse(claim.Value, out int uId))
+                    return new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
+
+                var user = await _accRepo.GetById(uId);
+                if (user == null)
+                    return new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
+
                 bool result = _repo.CanCreate(model);
                 if (!result)
-                {
                     return new HomeeResult(Const.FAIL_CREATE_CODE, "This address is already registered.");
-                }
-                await _repo.InsertAsync(_mapper.Map<Contract>(model));
+                var contract = _mapper.Map<Contract>(model);
+                contract.RenterId = uId;
+                contract.CreateAt = DateTime.Now;
+                await _repo.InsertAsync(contract);
                 var check = await _repo.SaveChangesAsync();
                 return check <= 0 ?
                     new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG) :
@@ -91,7 +101,7 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
-        public async Task<IHomeeResult> Update(int id, ContractRequest model)
+        public async Task<IHomeeResult> Update(int id, long model)
         {
             try
             {
@@ -100,8 +110,7 @@ namespace Homee.BusinessLayer.Services
                 {
                     return new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);
                 }
-                result.CreatedAt = model.CreatedAt;
-                result.Duration = model.Duration;
+                result.Duration = model;
 
                 _repo.Update(result);
                 var check = await _repo.SaveChangesAsync();
@@ -122,6 +131,22 @@ namespace Homee.BusinessLayer.Services
             {
                 var result = _repo.GetContractByCurrentUser(user);
                 return result == null || result.Count <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(_mapper.Map<ContractResponse>));
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
+        }
+
+        public async Task<IHomeeResult> Confirm(int contractId)
+        {
+            try
+            {
+                var result = await _repo.GetById(contractId);
+                if (result == null) return new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
+                result.Confirmed = true;
+                _repo.Update(result);
+                return _repo.SaveChanges() > 0 ? new HomeeResult(Const.SUCCESS_UPDATE_CODE, Const.SUCCESS_UPDATE_MSG) : new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);
             }
             catch (Exception ex)
             {

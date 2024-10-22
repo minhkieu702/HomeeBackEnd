@@ -27,11 +27,11 @@ namespace Homee.Repositories.Repositories
         }
         public List<Account> GetAccounts()
         {
-            return _context.Accounts.IncludeAll().ToList();
+            return _context.Accounts.IncludeAll(_context).ToList();
         }
         public Account GetAccount(int id)
         {
-            return _context.Accounts.IncludeAll().FirstOrDefault(c => c.AccountId == id);
+            return _context.Accounts.IncludeAll(_context).FirstOrDefault(c => c.AccountId == id);
         }
 
     }

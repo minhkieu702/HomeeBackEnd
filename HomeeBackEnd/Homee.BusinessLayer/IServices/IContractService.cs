@@ -15,9 +15,10 @@ namespace Homee.BusinessLayer.IServices
     {
         Task<IHomeeResult> GetAll();
         Task<IHomeeResult> GetById(int id);
-        Task<IHomeeResult> Update(int id, ContractRequest model);
+        Task<IHomeeResult> Update(int id, long model);
         Task<IHomeeResult> Delete(int id);
-        Task<IHomeeResult> Create(ContractRequest model);
+        Task<IHomeeResult> Create(ContractRequest model, ClaimsPrincipal claimsPrincipal);
         Task<IHomeeResult> GetByCurrentUser(ClaimsPrincipal user);
+        Task<IHomeeResult> Confirm(int contractId);
     }
 }

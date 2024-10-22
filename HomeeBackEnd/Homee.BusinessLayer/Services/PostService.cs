@@ -25,6 +25,7 @@ namespace Homee.BusinessLayer.Services
             _mapper = mapper;
             _repo = postRepository;
         }
+
         public async Task<IHomeeResult> Create(PostRequest model)
         {
             try

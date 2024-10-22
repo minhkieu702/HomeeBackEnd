@@ -8,6 +8,8 @@ using Homee.DataLayer.ResponseModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Homee.API.Controllers
 {
@@ -34,7 +36,11 @@ namespace Homee.API.Controllers
         [HttpPost("CreateBaseOnRoom")]
         public async Task<IActionResult> Create([FromBody] PostRequest post)
         {
-                using (var transaction = _context.Database.BeginTransaction())
+            if (CheckValidatationBeforePost())
+            {
+                return Ok(new HomeeResult(Const.FAIL_CREATE_CODE, "No paying"));
+            }
+            using (var transaction = _context.Database.BeginTransaction())
                 {
                 try
                 {
@@ -72,6 +78,34 @@ namespace Homee.API.Controllers
                 }   
                 }
         }
+
+        private bool CheckValidatationBeforePost()
+        {
+            try
+            {
+                var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (claim == null || !int.TryParse(claim.Value, out int uid)) return false;
+
+                var account = _context.Accounts
+                    .Include(c => c.Orders)
+                    .FirstOrDefault(c => c.AccountId == uid);
+                
+                if (account == null || account.Orders == null || account.Orders.Count == 0) return false;
+                
+                var order = account.Orders
+                    .FirstOrDefault(o => o.ExpiredAt < DateTime.Now || o.ExpiredAt == null);
+                
+                if (order == null) return false;
+                
+                return true;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
         [HttpGet("GetAll")]
         public IActionResult GetAll() => Ok(_service.GetAll().Result);
 
@@ -101,7 +135,14 @@ namespace Homee.API.Controllers
         /// <returns></returns>
         [HttpPost("Create")]
         [Authorize]
-        public IActionResult Publish([FromBody] PlacePostRequest model) => Ok(_service.PublishPost(model, User).Result);
+        public IActionResult Publish([FromBody] PlacePostRequest model)
+        {
+            if (CheckValidatationBeforePost())
+            {
+                return Ok(new HomeeResult(Const.FAIL_CREATE_CODE, "No paying"));
+            }
+            return Ok(_service.PublishPost(model, User).Result);
+        }
 
         /// <summary>
         /// update place room post 
@@ -115,6 +156,10 @@ namespace Homee.API.Controllers
         [HttpPost("CreateBasedOnPlace")]
         public async Task<IActionResult> CreateBasedOnPlace([FromBody]RoomPostRequest model)
         {
+            if (CheckValidatationBeforePost())
+            {
+                return Ok(new HomeeResult(Const.FAIL_CREATE_CODE, "No paying"));
+            }
             using (var trans = _context.Database.BeginTransaction())
             {
                 try

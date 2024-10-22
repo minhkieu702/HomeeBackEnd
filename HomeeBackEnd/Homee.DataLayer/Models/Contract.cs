@@ -7,15 +7,17 @@ public partial class Contract
 {
     public int ContractId { get; set; }
 
-    public int RenderId { get; set; }
+    public int? RoomId { get; set; }
 
-    public int PlaceId { get; set; }
+    public int? RenterId { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime? CreateAt { get; set; }
 
     public long? Duration { get; set; }
 
-    public virtual Place Place { get; set; } = null!;
+    public bool? Confirmed { get; set; }
 
-    public virtual Account Render { get; set; } = null!;
+    public virtual Account? Renter { get; set; }
+
+    public virtual Room? Room { get; set; }
 }

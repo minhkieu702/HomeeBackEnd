@@ -14,16 +14,19 @@ using Microsoft.AspNetCore.Http;
 using Homee.DataLayer.ResponseModels;
 using System.Security.Claims;
 using Homee.BusinessLayer.Helpers;
+using Microsoft.EntityFrameworkCore;
 
 namespace Homee.BusinessLayer.Services
 {
     public class PlaceService : IPlaceService
     {
+        private readonly HomeedbContext _context;
         private readonly IMapper _mapper;
         private readonly IPlaceRepository _repo;
 
-        public PlaceService(IMapper mapper, IPlaceRepository repository)
+        public PlaceService(IMapper mapper, IPlaceRepository repository, HomeedbContext context)
         {
+            _context = context;
             _mapper = mapper;
             _repo = repository;
         }
@@ -69,7 +72,7 @@ namespace Homee.BusinessLayer.Services
                 {
                     return new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
                 }
-                var result = _repo.GetAll(c => c.OwnerId == uid).IncludeAll();
+                var result = _repo.GetAll(c => c.OwnerId == uid).IncludeAll(_context);
                 return result.Count() <= 0 ? new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG) : new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(_mapper.Map<PlaceResponse>));
             }
             catch (Exception ex)

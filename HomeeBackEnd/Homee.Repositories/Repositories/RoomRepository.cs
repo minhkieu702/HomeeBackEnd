@@ -30,7 +30,7 @@ namespace Homee.Repositories.Repositories
                     return null;
                 }
 
-                return await _context.Rooms.IncludeAll().Where(c => c.Place.OwnerId == uId).ToListAsync();
+                return await _context.Rooms.IncludeAll(_context).Where(c => c.Place.OwnerId == uId).ToListAsync();
             }
             catch (Exception)
             {
@@ -41,7 +41,7 @@ namespace Homee.Repositories.Repositories
 
         public async Task<List<Room>> GetRoomByPlace(int placeId)
         {
-            return await _context.Rooms.IncludeAll().Where(c => c.PlaceId == placeId).ToListAsync();
+            return await _context.Rooms.IncludeAll(_context).Where(c => c.PlaceId == placeId).ToListAsync();
         }
 
         public async Task<int> UpdateRoom(int id, Room room)

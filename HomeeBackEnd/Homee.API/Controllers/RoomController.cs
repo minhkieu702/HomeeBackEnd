@@ -35,7 +35,7 @@ namespace Homee.API.Controllers
         {
             try
             {
-                var result = await _context.Rooms.IncludeAll().ToListAsync();
+                var result = await _context.Rooms.IncludeAll(_context).ToListAsync();
                 return result.Count == 0 ? NotFound(new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG)) : Ok(new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(_mapper.Map<RoomResponse>)));
             }
             catch (Exception ex)
@@ -49,7 +49,7 @@ namespace Homee.API.Controllers
         {
             try
             {
-                var result = await _context.Rooms.Where(p => p.PlaceId == placeId).IncludeAll().ToListAsync();
+                var result = await _context.Rooms.Where(p => p.PlaceId == placeId).IncludeAll(_context).ToListAsync();
                 return result.Count == 0 ? NotFound(new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG)) : Ok(new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, result.Select(_mapper.Map<RoomResponse>)));
             }
             catch (Exception ex)
@@ -63,7 +63,7 @@ namespace Homee.API.Controllers
         {
             try
             {
-                var result = await _context.Rooms.IncludeAll().FirstOrDefaultAsync(c => c.RoomId == id);
+                var result = await _context.Rooms.IncludeAll(_context).FirstOrDefaultAsync(c => c.RoomId == id);
                 return result == null ? NotFound(new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG)) : Ok(new HomeeResult(Const.SUCCESS_READ_CODE, Const.SUCCESS_READ_MSG, _mapper.Map<RoomResponse>(result)));
             }
             catch (Exception ex)
@@ -109,7 +109,7 @@ namespace Homee.API.Controllers
             {
                 try
                 {
-                    var room = await _context.Rooms.IncludeAll().FirstOrDefaultAsync(c => c.RoomId == roomId);
+                    var room = await _context.Rooms.IncludeAll(_context).FirstOrDefaultAsync(c => c.RoomId == roomId);
                     if (room == null) return BadRequest(new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG));
 
                     room.IsBlock = true;
@@ -141,7 +141,7 @@ namespace Homee.API.Controllers
             {
                 try
                 {
-                    var room = await _context.Rooms.IncludeAll().FirstOrDefaultAsync(c => c.RoomId == id);
+                    var room = await _context.Rooms.IncludeAll(_context).FirstOrDefaultAsync(c => c.RoomId == id);
                     if (room == null) return BadRequest(new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG));
 
                     _mapper.Map(model, room);

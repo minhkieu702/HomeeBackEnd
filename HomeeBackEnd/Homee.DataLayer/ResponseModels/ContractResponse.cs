@@ -11,16 +11,18 @@ namespace Homee.DataLayer.ResponseModels
     {
         public int ContractId { get; set; }
 
-        public int RenderId { get; set; }
+        public int? RoomId { get; set; }
 
-        public int PlaceId { get; set; }
+        public int? RenterId { get; set; }
 
         public DateTime CreatedAt { get; set; }
 
         public long? Duration { get; set; }
 
-        public virtual PlaceResponse Place { get; set; } = null!;
+        public bool? Confirmed { get; set; }
 
-        public virtual AccountResponse Render { get; set; } = null!;
+        public virtual RoomResponse Room { get; set; } = null!;
+
+        public virtual AccountResponse Renter { get; set; } = null!;
     }
 }

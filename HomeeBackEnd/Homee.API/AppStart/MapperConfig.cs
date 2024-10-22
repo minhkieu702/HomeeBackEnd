@@ -16,8 +16,8 @@ namespace Homee.API.AppStart
             #endregion
 
             #region Contract
-            CreateMap<Contract, ContractRequest>().ReverseMap();
-            CreateMap<Contract, ContractResponse>().ReverseMap();
+            CreateMap<ContractRequest, Contract>();
+            CreateMap<Contract, ContractResponse>();
             #endregion
              
             #region FavoritePost

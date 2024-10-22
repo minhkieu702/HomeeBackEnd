@@ -8,12 +8,12 @@ namespace Homee.DataLayer.RequestModels
 {
     public class ContractRequest
     {
-        public int RenderId { get; set; }
-
-        public int PlaceId { get; set; }
+        public int RoomId { get; set; }
 
         public long Duration { get; set; }
 
         public DateTime CreatedAt { get; set; }
+
+        public bool? Confirmed { get; set; }
     }
 }

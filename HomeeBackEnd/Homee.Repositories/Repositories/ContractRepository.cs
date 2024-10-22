@@ -18,10 +18,10 @@ namespace Homee.Repositories.Repositories
         }
         public bool CanCreate(ContractRequest request)
         {
-            var oldContracts = _context.Contracts.Where(c => request.PlaceId == c.PlaceId);
+            var oldContracts = _context.Contracts.Where(c => request.RoomId == c.RoomId);
             foreach (var oldContract in oldContracts)
             {
-                var expiredDate = oldContract.CreatedAt.AddDays((double)oldContract.Duration);
+                var expiredDate = oldContract.CreateAt.Value.AddDays((double)oldContract.Duration);
                 if (expiredDate <= DateTime.Now)
                 {
                     return false;
@@ -34,7 +34,7 @@ namespace Homee.Repositories.Repositories
         {
             try
             {
-                return _context.Contracts.IncludeAll().FirstOrDefault(c => c.ContractId == id);
+                return GetContracts().FirstOrDefault(c => c.ContractId == id);
             }
             catch (Exception)
             {
@@ -53,7 +53,10 @@ namespace Homee.Repositories.Repositories
                     return null;
                 }
 
-                return _context.Contracts.IncludeAll().Where(c => c.Place.OwnerId == uId).ToList();
+                return _context.Contracts
+                .Include(c => c.Room).ThenInclude(c => c.Place).ThenInclude(c => c.Owner)
+                .Include(c => c.Renter)
+                    .Where(c => c.Room.Place.OwnerId == uId).ToList();
             }
             catch (Exception)
             {
@@ -64,7 +67,10 @@ namespace Homee.Repositories.Repositories
 
         public List<Contract> GetContracts()
         {
-            return _context.Contracts.IncludeAll().ToList();
+            return _context.Contracts
+                .Include(c => c.Room).ThenInclude(c => c.Place).ThenInclude(c => c.Owner)
+                .Include(c => c.Renter)
+                .ToList();
         }
     }
 }

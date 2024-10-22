@@ -40,11 +40,11 @@ namespace Homee.Repositories.Repositories
         }
         public Order GetOrder(int id)
         {
-            return _context.Orders.IncludeAll().FirstOrDefault(c => c.OrderId == id);
+            return _context.Orders.IncludeAll(_context).FirstOrDefault(c => c.OrderId == id);
         }
         public List<Order> GetAllOrders()
         {
-            var orders = _context.Orders.IncludeAll().ToList();
+            var orders = _context.Orders.IncludeAll(_context).ToList();
             return orders;
         }
 
@@ -52,7 +52,11 @@ namespace Homee.Repositories.Repositories
         {
             try
             {
-                if (request.Status != "PAID") return -1;
+                PayOS payOS = new(_config["PAYOS_CLIENT_ID"], _config["PAYOS_API_KEY"], _config["PAYOS_CHECKSUM_KEY"]);
+
+                var paymentLinkInformation = await payOS.getPaymentLinkInformation(request.OrderCode);
+
+                if (paymentLinkInformation.status != "PAID") return -1;
 
                 if (_context.Orders.FirstOrDefault(c => request.PaymentId.Equals(c.PaymentId)) != null) return 0;
 
@@ -64,7 +68,29 @@ namespace Homee.Repositories.Repositories
                 throw;
             }
         }
+        public async Task<string> CreatePaymentUrl()
+        {
+            try
+            {
+                PayOS payOS = new(_config["PAYOS_CLIENT_ID"], _config["PAYOS_API_KEY"], _config["PAYOS_CHECKSUM_KEY"]);
 
+                var item = new ItemData("post", 1, 20_000);
+
+                List<ItemData> items = [item];
+                int expired = int.Parse(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds().ToString());
+
+                var paymentData = new PaymentData(SupportingFeature.Instance.GenerateUniqueCode(), item.price, "one post", items, _config["PAYOS_RETURN_URL"], _config["PAYOS_RETURN_URL"], expiredAt: expired);
+
+                CreatePaymentResult createPayment = await payOS.createPaymentLink(paymentData);
+
+                return createPayment.checkoutUrl;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
         public async Task<string> CreatePaymentUrl(int subId)
         {
             try
@@ -78,8 +104,9 @@ namespace Homee.Repositories.Repositories
                 var item = new ItemData(subscription.SubscriptionName, 1, (int)subscription.Price);
                                 
                 List<ItemData> items = [item];
+                int expired = int.Parse(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds().ToString());
 
-                var paymentData = new PaymentData(long.Parse(subId.ToString() + DateTime.Now.Ticks%100000), item.price, subscription.SubscriptionName, items, _config["PAYOS_RETURN_URL"], _config["PAYOS_RETURN_URL"]);
+                var paymentData = new PaymentData(SupportingFeature.Instance.GetOrderCode(subId), item.price, subscription.SubscriptionName, items, _config["PAYOS_RETURN_URL"], _config["PAYOS_RETURN_URL"], expiredAt: expired);
 
                 CreatePaymentResult createPayment = await payOS.createPaymentLink(paymentData);
                 
@@ -97,21 +124,28 @@ namespace Homee.Repositories.Repositories
             try
             {
                 var subscription = _context.Subscriptions.FirstOrDefault(c => c.SubscriptionId == payment.SubId);
-
-                if (subscription == null) return 0;
-                
                 var accId = 1;
-                //if (SupportingFeature.GetValueFromSession("user", out Account user, httpContext)) accId = user.AccountId;
-
-                var order = new Order
+                var order = new Order();
+                if (subscription == null)
                 {
-                    SubscriptionId = payment.SubId,
-                    SubscribedAt = DateTime.Now,
-                    ExpiredAt = DateTime.Now.AddDays((double)subscription.Duration),
-                    PaymentId = payment.PaymentId,
-                    OwnerId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier).ToString())
-                };
-
+                    order = new Order
+                    {
+                        SubscribedAt = DateTime.Now,
+                        OwnerId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier).ToString()),
+                        PaymentId = payment.PaymentId,
+                    };
+                }
+                else
+                {
+                    order = new Order
+                    {
+                        SubscriptionId = payment.SubId,
+                        SubscribedAt = DateTime.Now,
+                        ExpiredAt = DateTime.Now.AddDays((double)subscription.Duration),
+                        PaymentId = payment.PaymentId,
+                        OwnerId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier).ToString())
+                    };
+                }
                 await _context.Orders.AddAsync(order);
                 return await _context.SaveChangesAsync();
             }

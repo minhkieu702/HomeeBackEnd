@@ -83,21 +83,20 @@ public partial class HomeedbContext : DbContext
 
         modelBuilder.Entity<Contract>(entity =>
         {
-            entity.HasKey(e => e.ContractId).HasName("PK__Contract__C90D3469C5738CE8");
+            entity.HasKey(e => e.ContractId).HasName("PK__Contract__C90D3469DD732F05");
 
             entity.ToTable("Contract");
 
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.Confirmed).HasDefaultValue(false);
+            entity.Property(e => e.CreateAt).HasColumnType("datetime");
 
-            entity.HasOne(d => d.Place).WithMany(p => p.Contracts)
-                .HasForeignKey(d => d.PlaceId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Contract_Place");
+            entity.HasOne(d => d.Renter).WithMany(p => p.Contracts)
+                .HasForeignKey(d => d.RenterId)
+                .HasConstraintName("FK_Contract_Renter");
 
-            entity.HasOne(d => d.Render).WithMany(p => p.Contracts)
-                .HasForeignKey(d => d.RenderId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Contract_Render");
+            entity.HasOne(d => d.Room).WithMany(p => p.Contracts)
+                .HasForeignKey(d => d.RoomId)
+                .HasConstraintName("FK_Contract_Room");
         });
 
         modelBuilder.Entity<FavoritePost>(entity =>
@@ -170,26 +169,20 @@ public partial class HomeedbContext : DbContext
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrderId).HasName("PK__Order__C3905BCF5B4B450D");
+            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BCF0FAA15ED");
 
-            entity.ToTable("Order");
-
+            entity.Property(e => e.OrderId).ValueGeneratedNever();
             entity.Property(e => e.ExpiredAt).HasColumnType("datetime");
-            entity.Property(e => e.PaymentId)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("paymentId");
+            entity.Property(e => e.PaymentId).HasMaxLength(255);
             entity.Property(e => e.SubscribedAt).HasColumnType("datetime");
 
             entity.HasOne(d => d.Owner).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.OwnerId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Order_Owner");
+                .HasConstraintName("FK_Owner");
 
             entity.HasOne(d => d.Subscription).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.SubscriptionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Order_Subscription");
+                .HasConstraintName("FK_Subscription");
         });
 
         modelBuilder.Entity<Place>(entity =>

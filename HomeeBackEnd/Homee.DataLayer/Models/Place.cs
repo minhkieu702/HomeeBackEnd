@@ -21,8 +21,6 @@ public partial class Place
 
     public bool IsBlock { get; set; }
 
-    public virtual ICollection<Contract> Contracts { get; set; } = new List<Contract>();
-
     public virtual Account Owner { get; set; } = null!;
 
     public virtual ICollection<Room> Rooms { get; set; } = new List<Room>();

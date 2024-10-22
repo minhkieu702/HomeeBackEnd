@@ -28,13 +28,13 @@ namespace Homee.Repositories.Repositories
 
         public Subscription GetSubscription(int id)
         {
-            return _context.Subscriptions.IncludeAll().FirstOrDefault(c => c.SubscriptionId == id);
+            return _context.Subscriptions.IncludeAll(_context).FirstOrDefault(c => c.SubscriptionId == id);
 
         }
 
         public List<Subscription> GetSubscriptions()
         {
-            return _context.Subscriptions.IncludeAll().ToList();
+            return _context.Subscriptions.IncludeAll(_context).ToList();
         }
 
         public int CanDelete(int id)

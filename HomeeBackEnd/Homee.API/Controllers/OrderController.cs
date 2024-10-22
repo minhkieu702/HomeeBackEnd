@@ -1,4 +1,5 @@
-﻿using Homee.BusinessLayer.IServices;
+﻿using Homee.BusinessLayer.Helpers;
+using Homee.BusinessLayer.IServices;
 using Homee.DataLayer.RequestModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -46,7 +47,8 @@ namespace Homee.API.Controllers
         {
             var result = new PAYOS_RETURN_URLRequest();
             result.Code = int.Parse(HttpContext.Request.Query["code"].ToString());
-            result.SubId = int.Parse(HttpContext.Request.Query["ordercode"].ToString().Substring(0, 1));
+            result.SubId = SupportingFeature.Instance.ExtractSubIdFromCombinedCode(long.Parse(HttpContext.Request.Query["ordercode"].ToString()));
+            result.OrderCode = long.Parse(HttpContext.Request.Query["ordercode"].ToString());
             result.Cancel = bool.Parse(HttpContext.Request.Query["cancel"].ToString());
             result.PaymentId = HttpContext.Request.Query["id"].ToString();
             result.Status = HttpContext.Request.Query["status"].ToString();

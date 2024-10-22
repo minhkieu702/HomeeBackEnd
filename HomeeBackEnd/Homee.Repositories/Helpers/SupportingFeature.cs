@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,19 +25,21 @@ namespace Homee.BusinessLayer.Helpers
 
             return propInfo.GetValue(obj);
         }
-        public static IQueryable<TEntity> IncludeAll<TEntity>(this IQueryable<TEntity> query) where TEntity : class
+        public static IQueryable<TEntity> IncludeAll<TEntity>(this IQueryable<TEntity> query, DbContext context) where TEntity : class
         {
-            HomeedbContext _context = new HomeedbContext();
+            var entityType = context.Model.FindEntityType(typeof(TEntity));
 
-            var entityType = typeof(TEntity);
+            if (entityType == null)
+            {
+                throw new InvalidOperationException($"The entity type '{typeof(TEntity).Name}' was not found in the model.");
+            }
 
-            // Lấy tất cả các navigation properties của entity
-            var navigations = _context.Model.FindEntityType(entityType)
-                .GetNavigations();
+            // Get all the navigation properties of the entity
+            var navigations = entityType.GetNavigations();
 
             foreach (var navigation in navigations)
             {
-                // Gọi Include cho mỗi navigation property
+                // Dynamically call Include for each navigation property
                 query = query.Include(navigation.Name);
             }
 
@@ -62,6 +65,36 @@ namespace Homee.BusinessLayer.Helpers
                 }
             }
         }
+        public long GenerateUniqueCode()
+        {
+            byte[] buffer = new byte[8]; // 8 bytes để tạo ra một giá trị long
+            RandomNumberGenerator.Fill(buffer); // Tạo giá trị ngẫu nhiên an toàn
+
+            long uniqueCode = BitConverter.ToInt64(buffer, 0);
+
+            return Math.Abs(uniqueCode); // Trả về giá trị dương
+        }
+
+        public long GetOrderCode(int subId)
+        {
+            long uniqueCode = GenerateUniqueCode();
+
+            // Dịch subId sang hàng tỷ (10^12) để tránh trùng lặp với mã unique
+            long combinedCode = (subId * 1000000000000L) + (uniqueCode % 1000000000000L);
+
+            return combinedCode;
+        }
+
+        public int ExtractSubIdFromCombinedCode(long combinedCode)
+        {
+            return (int)(combinedCode / 1000000000000L);
+        }
+
+        public long ExtractUniqueCodeFromCombinedCode(long combinedCode)
+        {
+            return combinedCode % 1000000000000L;
+        }
+
         public string GenerateOTP()
         {
             // Create a random number generator

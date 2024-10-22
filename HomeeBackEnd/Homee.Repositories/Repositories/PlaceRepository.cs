@@ -38,12 +38,12 @@ namespace Homee.Repositories.Repositories
 
         public Place GetPlace(int id)
         {
-            return _context.Places.IncludeAll().FirstOrDefault(c => c.PlaceId == id);
+            return _context.Places.IncludeAll(_context).FirstOrDefault(c => c.PlaceId == id);
         }
 
         public List<Place> GetPlaces()
         {
-            return _context.Places.IncludeAll().ToList();
+            return _context.Places.IncludeAll(_context).ToList();
         }
         private int GetUserId(ClaimsPrincipal user)
         {

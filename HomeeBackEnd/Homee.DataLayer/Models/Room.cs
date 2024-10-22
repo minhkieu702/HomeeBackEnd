@@ -35,6 +35,8 @@ public partial class Room
 
     public int? BedRoom { get; set; }
 
+    public virtual ICollection<Contract> Contracts { get; set; } = new List<Contract>();
+
     public virtual Place? Place { get; set; }
 
     public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
