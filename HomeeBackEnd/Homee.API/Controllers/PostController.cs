@@ -36,7 +36,8 @@ namespace Homee.API.Controllers
         [HttpPost("CreateBaseOnRoom")]
         public async Task<IActionResult> Create([FromBody] PostRequest post)
         {
-            if (CheckValidatationBeforePost())
+            long orderId = 0;
+            if (!CheckValidatationBeforePost(ref orderId))
             {
                 return Ok(new HomeeResult(Const.FAIL_CREATE_CODE, "No paying"));
             }
@@ -69,6 +70,12 @@ namespace Homee.API.Controllers
                         return BadRequest(new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG));
                     }
                     transaction.Commit();
+
+                    if (orderId != 0)
+                    {
+                        ExpiredOrder(orderId);
+                    }
+
                     return Ok(new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG, post ));
                 }
                 catch (Exception ex)
@@ -79,7 +86,23 @@ namespace Homee.API.Controllers
                 }
         }
 
-        private bool CheckValidatationBeforePost()
+        private int ExpiredOrder(long orderId)
+        {
+            try
+            {
+                var order = _context.Orders.FirstOrDefault(c => c.OrderId == orderId);
+                order.ExpiredAt= DateTime.Now.AddDays(-1);
+                _context.Orders.Update(order);
+                return _context.SaveChanges();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private bool CheckValidatationBeforePost(ref long orderId)
         {
             try
             {
@@ -92,10 +115,13 @@ namespace Homee.API.Controllers
                 
                 if (account == null || account.Orders == null || account.Orders.Count == 0) return false;
                 
+                //take order have expiredAt is null (one post) or subscription is not expired
                 var order = account.Orders
-                    .FirstOrDefault(o => o.ExpiredAt < DateTime.Now || o.ExpiredAt == null);
+                    .LastOrDefault(o => (o.ExpiredAt >= DateTime.Now || o.ExpiredAt == null) && o.PaymentId != null);
                 
                 if (order == null) return false;
+
+                if (order.ExpiredAt == null) orderId = order.OrderId;
                 
                 return true;
             }
@@ -137,10 +163,17 @@ namespace Homee.API.Controllers
         [Authorize]
         public IActionResult Publish([FromBody] PlacePostRequest model)
         {
-            if (CheckValidatationBeforePost())
+            long orderId = 0;
+            if (!CheckValidatationBeforePost(ref orderId))
             {
                 return Ok(new HomeeResult(Const.FAIL_CREATE_CODE, "No paying"));
             }
+
+            if (orderId != 0)
+            {
+                ExpiredOrder(orderId);
+            }
+
             return Ok(_service.PublishPost(model, User).Result);
         }
 
@@ -156,7 +189,8 @@ namespace Homee.API.Controllers
         [HttpPost("CreateBasedOnPlace")]
         public async Task<IActionResult> CreateBasedOnPlace([FromBody]RoomPostRequest model)
         {
-            if (CheckValidatationBeforePost())
+            long orderId = 0;
+            if (!CheckValidatationBeforePost(ref orderId))
             {
                 return Ok(new HomeeResult(Const.FAIL_CREATE_CODE, "No paying"));
             }
@@ -203,6 +237,11 @@ namespace Homee.API.Controllers
                     }
 
                     await trans.CommitAsync();
+
+                    if (orderId != 0)
+                    {
+                        ExpiredOrder(orderId);
+                    }
 
                     return Ok(new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG, _mapper.Map<PostResponse>(post)));
                 }

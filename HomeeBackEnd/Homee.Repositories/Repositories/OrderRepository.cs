@@ -1,10 +1,12 @@
-﻿using Homee.BusinessLayer.Helpers;
+﻿using Azure.Core;
+using Homee.BusinessLayer.Helpers;
 using Homee.DataLayer.Models;
 using Homee.DataLayer.RequestModels;
 using Homee.Repositories.IRepositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Net.payOS;
 using Net.payOS.Types;
 using System;
@@ -55,7 +57,7 @@ namespace Homee.Repositories.Repositories
                 PayOS payOS = new(_config["PAYOS_CLIENT_ID"], _config["PAYOS_API_KEY"], _config["PAYOS_CHECKSUM_KEY"]);
 
                 var paymentLinkInformation = await payOS.getPaymentLinkInformation(request.OrderCode);
-
+                
                 if (paymentLinkInformation.status != "PAID") return -1;
 
                 if (_context.Orders.FirstOrDefault(c => request.PaymentId.Equals(c.PaymentId)) != null) return 0;
@@ -68,90 +70,148 @@ namespace Homee.Repositories.Repositories
                 throw;
             }
         }
-        public async Task<string> CreatePaymentUrl()
+
+        private Account? GetAccount(ClaimsPrincipal? user, string? email)
+        {
+            if (user == null && !email.IsNullOrEmpty())
+            {
+                return _context.Accounts.FirstOrDefault(c => c.Email.Equals(email));
+            }
+            var accountId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            return _context.Accounts.FirstOrDefault(c => c.AccountId.Equals(accountId));
+        }
+
+        public async Task<string> CreatePaymentUrl(ClaimsPrincipal user)
         {
             try
             {
-                PayOS payOS = new(_config["PAYOS_CLIENT_ID"], _config["PAYOS_API_KEY"], _config["PAYOS_CHECKSUM_KEY"]);
+                // Initialize PayOS client
+                var payOS = new PayOS(_config["PAYOS_CLIENT_ID"], _config["PAYOS_API_KEY"], _config["PAYOS_CHECKSUM_KEY"]);
 
+                // Retrieve the account from the database
+                var account = GetAccount(user, null);
+
+                if (account == null)
+                    throw new Exception("Account not found.");
+
+                var orderCode = SupportingFeature.Instance.GetOrderCode(0);
+
+                var order = new Order
+                {
+                    OrderId = orderCode,
+                    SubscribedAt = DateTime.Now,
+                    OwnerId = account.AccountId,
+                };
+
+                // Create payment item
                 var item = new ItemData("post", 1, 20_000);
+                var items = new List<ItemData> { item };
 
-                List<ItemData> items = [item];
-                int expired = int.Parse(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds().ToString());
+                // Set expiration time
+                int expired = (int)DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds();
 
-                var paymentData = new PaymentData(SupportingFeature.Instance.GenerateUniqueCode(), item.price, "one post", items, _config["PAYOS_RETURN_URL"], _config["PAYOS_RETURN_URL"], expiredAt: expired);
+                // Build payment data
+                var paymentData = new PaymentData(
+                    SupportingFeature.Instance.GetOrderCode(0),
+                    item.price,
+                    "one post",
+                    items,
+                    _config["PAYOS_RETURN_URL"],
+                    _config["PAYOS_RETURN_URL"],
+                    expiredAt: expired,
+                    buyerEmail: account.Email
+                );
 
-                CreatePaymentResult createPayment = await payOS.createPaymentLink(paymentData);
-
+                // Create payment link
+                var createPayment = await payOS.createPaymentLink(paymentData);
                 return createPayment.checkoutUrl;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
-            }
-        }
-        public async Task<string> CreatePaymentUrl(int subId)
-        {
-            try
-            {
-                PayOS payOS = new(_config["PAYOS_CLIENT_ID"], _config["PAYOS_API_KEY"], _config["PAYOS_CHECKSUM_KEY"]);
-                
-                var subscription = _context.Subscriptions.FirstOrDefault(c => c.SubscriptionId == subId);
-                
-                if (subscription == null) return null;
-                
-                var item = new ItemData(subscription.SubscriptionName, 1, (int)subscription.Price);
-                                
-                List<ItemData> items = [item];
-                int expired = int.Parse(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds().ToString());
-
-                var paymentData = new PaymentData(SupportingFeature.Instance.GetOrderCode(subId), item.price, subscription.SubscriptionName, items, _config["PAYOS_RETURN_URL"], _config["PAYOS_RETURN_URL"], expiredAt: expired);
-
-                CreatePaymentResult createPayment = await payOS.createPaymentLink(paymentData);
-                
-                return createPayment.checkoutUrl;
-            }
-            catch (Exception)
-            {
-
-                throw;
+                // Handle exceptions and log if needed
+                throw new Exception("Error while creating payment URL", ex);
             }
         }
 
-        public async Task<int> InsertOrder(PAYOS_RETURN_URLRequest payment, ClaimsPrincipal user)
+        public async Task<string> CreatePaymentUrl(int subId, ClaimsPrincipal user)
         {
             try
             {
-                var subscription = _context.Subscriptions.FirstOrDefault(c => c.SubscriptionId == payment.SubId);
-                var accId = 1;
-                var order = new Order();
+                // Initialize PayOS client
+                var payOS = new PayOS(_config["PAYOS_CLIENT_ID"], _config["PAYOS_API_KEY"], _config["PAYOS_CHECKSUM_KEY"]);
+
+                // Retrieve the account from the database
+                var account = GetAccount(user, null);
+
+                if (account == null)
+                    throw new Exception("Account not found.");
+
+                // Retrieve the subscription from the database
+                var subscription = _context.Subscriptions.FirstOrDefault(s => s.SubscriptionId == subId);
                 if (subscription == null)
+                    throw new Exception("Subscription not found.");
+
+                var order = new Order
                 {
-                    order = new Order
-                    {
-                        SubscribedAt = DateTime.Now,
-                        OwnerId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier).ToString()),
-                        PaymentId = payment.PaymentId,
-                    };
-                }
-                else
-                {
-                    order = new Order
-                    {
-                        SubscriptionId = payment.SubId,
-                        SubscribedAt = DateTime.Now,
-                        ExpiredAt = DateTime.Now.AddDays((double)subscription.Duration),
-                        PaymentId = payment.PaymentId,
-                        OwnerId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier).ToString())
-                    };
-                }
-                await _context.Orders.AddAsync(order);
+                    SubscriptionId = subId,
+                    SubscribedAt = DateTime.Now,
+                    ExpiredAt = DateTime.Now.AddDays((double)subscription.Duration),
+                    OwnerId = account.AccountId,
+                };
+
+                _context.Orders.Add(order);
+                var check = await _context.SaveChangesAsync();
+                if (check == 0)
+                    throw new Exception("Cannot create");
+
+                // Create payment item based on subscription
+                var item = new ItemData(subscription.SubscriptionName, 1, (int)subscription.Price);
+                var items = new List<ItemData> { item };
+
+                // Set expiration time
+                int expired = (int)DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds();
+
+                // Build payment data
+                var paymentData = new PaymentData(
+                    SupportingFeature.Instance.GetOrderCode(subId),
+                    item.price,
+                    subscription.SubscriptionName,
+                    items,
+                    _config["PAYOS_RETURN_URL"],
+                    _config["PAYOS_RETURN_URL"],
+                    expiredAt: expired,
+                    buyerEmail: account.Email
+                );
+
+                // Create payment link
+                var createPayment = await payOS.createPaymentLink(paymentData);
+                return createPayment.checkoutUrl;
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions and log if needed
+                throw new Exception("Error while creating payment URL", ex);
+            }
+        }
+
+
+        public async Task<int> ConfirmOrder(PAYOS_RETURN_URLRequest payment)
+        {
+            try
+            {
+                var payOS = new PayOS(_config["PAYOS_CLIENT_ID"], _config["PAYOS_API_KEY"], _config["PAYOS_CHECKSUM_KEY"]);
+
+                var subscription = _context.Subscriptions.FirstOrDefault(c => c.SubscriptionId == payment.SubId);
+
+                var order = _context.Orders.FirstOrDefault(c => c.OrderId == payment.OrderCode);
+
+                order.PaymentId = payment.PaymentId;
+
+                _context.Orders.Update(order);
                 return await _context.SaveChangesAsync();
             }
             catch (Exception)
             {
-
                 throw;
             }
         }

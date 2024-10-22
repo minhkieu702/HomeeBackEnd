@@ -10,8 +10,6 @@ namespace Homee.BusinessLayer.Commons
     {
         Free,//buy subscription then be premium
         Premium, 
-        Staff,
-        Manager,
         Administrator
     }
     public enum PlaceDirection

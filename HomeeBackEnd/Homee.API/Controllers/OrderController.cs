@@ -21,9 +21,21 @@ namespace Homee.API.Controllers
             _config = configuration;
             _service = placeService;
         }
+        /// <summary>
+        /// paying to have subscription
+        /// </summary>
+        /// <param name="subscriptionId"></param>
+        /// <returns></returns>
         [Authorize]
-        [HttpPost("Create")]
-        public IActionResult Create([FromBody] int subscriptionId) => Ok(_service.Create(subscriptionId).Result);
+        [HttpPost("Subscription")]
+        public IActionResult Create([FromBody] int subscriptionId) => Ok(_service.Create(subscriptionId, User).Result);
+        /// <summary>
+        /// pay to post a posting
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("Posting")]
+        public IActionResult Create() => Ok(_service.Create(User).Result);
 
         [HttpGet("GetAll")]
         public IActionResult GetAll() => Ok(_service.GetAll().Result);
@@ -53,7 +65,7 @@ namespace Homee.API.Controllers
             result.PaymentId = HttpContext.Request.Query["id"].ToString();
             result.Status = HttpContext.Request.Query["status"].ToString();
             
-            return Ok(_service.ExecutePayment(result, User).Result);
+            return Ok(_service.ExecutePayment(result).Result);
         }
     }
 }

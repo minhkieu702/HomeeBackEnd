@@ -5,7 +5,7 @@ namespace Homee.DataLayer.Models;
 
 public partial class Order
 {
-    public int OrderId { get; set; }
+    public long OrderId { get; set; }
 
     public int? SubscriptionId { get; set; }
 

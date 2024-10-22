@@ -26,7 +26,7 @@ namespace Homee.BusinessLayer.Services
             _mappper = mapper;
             _repo = orderRepository;
         }
-        public async Task<IHomeeResult> Create(int subId)
+        public async Task<IHomeeResult> Create(int subId, ClaimsPrincipal user)
         {
             try
             {
@@ -35,7 +35,27 @@ namespace Homee.BusinessLayer.Services
                 //{
                 //    return new HomeeResult(Const.FAIL_CREATE_CODE, "This address is already registered.");
                 //}
-                string check = await _repo.CreatePaymentUrl(subId);
+                string check = await _repo.CreatePaymentUrl(subId, user);
+                return check == null || check.Length <= 0 ?
+                    new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG) :
+                    new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG, check);
+            }
+            catch (Exception ex)
+            {
+                return new HomeeResult(Const.ERROR_EXCEPTION, ex.Message);
+            }
+        }
+
+        public async Task<IHomeeResult> Create(ClaimsPrincipal user)
+        {
+            try
+            {
+                //bool result = await _repo.CanInsert(subId);
+                //if (!result)
+                //{
+                //    return new HomeeResult(Const.FAIL_CREATE_CODE, "This address is already registered.");
+                //}
+                string check = await _repo.CreatePaymentUrl(user);
                 return check == null || check.Length <= 0 ?
                     new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG) :
                     new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG, check);
@@ -64,14 +84,14 @@ namespace Homee.BusinessLayer.Services
             }
         }
         
-        public async Task<IHomeeResult> ExecutePayment(PAYOS_RETURN_URLRequest payment, ClaimsPrincipal user)
+        public async Task<IHomeeResult> ExecutePayment(PAYOS_RETURN_URLRequest payment)
         {
             try
             {
                 var result = await _repo.CanInsert(payment);
                 if (result == -1) return new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
                 if (result == 0) return new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG);
-                var check = await _repo.InsertOrder(payment, user);
+                var check = await _repo.ConfirmOrder(payment);
                 return check > 0 ? new HomeeResult(Const.SUCCESS_CREATE_CODE, Const.SUCCESS_CREATE_MSG) : new HomeeResult(Const.FAIL_CREATE_CODE, Const.FAIL_CREATE_MSG);
             }
             catch (Exception ex)

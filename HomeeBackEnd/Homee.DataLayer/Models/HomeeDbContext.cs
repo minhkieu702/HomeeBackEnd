@@ -169,7 +169,7 @@ public partial class HomeedbContext : DbContext
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BCF0FAA15ED");
+            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BCF86B298A9");
 
             entity.Property(e => e.OrderId).ValueGeneratedNever();
             entity.Property(e => e.ExpiredAt).HasColumnType("datetime");
