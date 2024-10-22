@@ -40,7 +40,7 @@ namespace Homee.Repositories.Repositories
             _context.Orders.Update(result);
             return await _context.SaveChangesAsync();
         }
-        public Order GetOrder(int id)
+        public Order GetOrder(long id)
         {
             return _context.Orders.IncludeAll(_context).FirstOrDefault(c => c.OrderId == id);
         }
@@ -102,6 +102,9 @@ namespace Homee.Repositories.Repositories
                     SubscribedAt = DateTime.Now,
                     OwnerId = account.AccountId,
                 };
+                _context.Orders.Add(order);
+                if (_context.SaveChanges() == 0)
+                    throw new Exception("Save order failed");
 
                 // Create payment item
                 var item = new ItemData("post", 1, 20_000);
@@ -199,15 +202,28 @@ namespace Homee.Repositories.Repositories
         {
             try
             {
-                var payOS = new PayOS(_config["PAYOS_CLIENT_ID"], _config["PAYOS_API_KEY"], _config["PAYOS_CHECKSUM_KEY"]);
-
-                var subscription = _context.Subscriptions.FirstOrDefault(c => c.SubscriptionId == payment.SubId);
-
                 var order = _context.Orders.FirstOrDefault(c => c.OrderId == payment.OrderCode);
+
+                if (order == null) throw new Exception("No order is found");
+
+                if (payment.Status == "CANCELLED")
+                {
+                    _context.Orders.Remove(order);
+
+                    return await _context.SaveChangesAsync();
+                }
+
+                if (order.ExpiredAt != null)
+                {
+                    var account = _context.Accounts.Find(order.OwnerId);
+                    if (account == null) throw new Exception("No account is found");
+                    account.Role = 1;
+                }
 
                 order.PaymentId = payment.PaymentId;
 
                 _context.Orders.Update(order);
+                
                 return await _context.SaveChangesAsync();
             }
             catch (Exception)

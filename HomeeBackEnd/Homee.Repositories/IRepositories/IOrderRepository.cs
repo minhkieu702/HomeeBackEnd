@@ -14,7 +14,7 @@ namespace Homee.Repositories.IRepositories
     {
         Task<int> CanInsert(PAYOS_RETURN_URLRequest model);
         List<Order> GetAllOrders();
-        Order GetOrder(int id);
+        Order GetOrder(long id);
         Task<string> CreatePaymentUrl(int subId, ClaimsPrincipal user);
         Task<string> CreatePaymentUrl(ClaimsPrincipal user);
         Task<int> UpdatePlace(Order result, OrderRequest model);

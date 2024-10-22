@@ -66,11 +66,11 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
-        public async Task<IHomeeResult> Delete(int id)
+        public async Task<IHomeeResult> Delete(long id)
         {
             try
             {
-                var result = await _repo.GetById(id);
+                var result = _repo.Find(c => c.OrderId == id);
                 if (result == null) return new HomeeResult(Const.WARNING_NO_DATA_CODE, Const.WARNING_NO_DATA__MSG);
 
                 _repo.Delete(result);
@@ -127,7 +127,7 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
-        public async Task<IHomeeResult> GetById(int id)
+        public async Task<IHomeeResult> GetById(long id)
         {
             try
             {
@@ -140,11 +140,11 @@ namespace Homee.BusinessLayer.Services
             }
         }
 
-        public async Task<IHomeeResult> Update(int id, OrderRequest model)
+        public async Task<IHomeeResult> Update(long id, OrderRequest model)
         {
             try
             {
-                var result = await _repo.GetById(id);
+                var result = _repo.Find(c => c.OrderId == id);
                 if (result == null)
                 {
                     return new HomeeResult(Const.FAIL_UPDATE_CODE, Const.FAIL_UPDATE_MSG);

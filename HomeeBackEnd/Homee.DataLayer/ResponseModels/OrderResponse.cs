@@ -9,7 +9,7 @@ namespace Homee.DataLayer.ResponseModels
 {
     public class OrderResponse
     {
-        public int OrderId { get; set; }
+        public long OrderId { get; set; }
 
         public int SubscriptionId { get; set; }
 

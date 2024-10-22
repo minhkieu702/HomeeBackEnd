@@ -13,11 +13,11 @@ namespace Homee.BusinessLayer.IServices
     public interface IOrderService
     {
         Task<IHomeeResult> GetAll();
-        Task<IHomeeResult> GetById(int id);
-        Task<IHomeeResult> Update(int id, OrderRequest model);
-        Task<IHomeeResult>Create(int model, ClaimsPrincipal user);
+        Task<IHomeeResult> GetById(long id);
+        Task<IHomeeResult> Update(long id, OrderRequest model);
+        Task<IHomeeResult>Create(int subId, ClaimsPrincipal user);
         Task<IHomeeResult> Create(ClaimsPrincipal user);
-        Task<IHomeeResult> Delete(int id);
+        Task<IHomeeResult> Delete(long id);
         Task<IHomeeResult> ExecutePayment(PAYOS_RETURN_URLRequest result);
         Task<IHomeeResult> GetByCurrentUser(ClaimsPrincipal user);
     }

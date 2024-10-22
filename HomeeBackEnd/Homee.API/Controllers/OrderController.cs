@@ -41,17 +41,17 @@ namespace Homee.API.Controllers
         public IActionResult GetAll() => Ok(_service.GetAll().Result);
 
         [HttpGet("GetById/{id}")]
-        public IActionResult GetById(int id) => Ok(_service.GetById(id));
+        public IActionResult GetById(long id) => Ok(_service.GetById(id));
 
         [HttpGet("GetByCurrentUser")]
         [Authorize]
         public IActionResult GetByCurrentUser() => Ok(_service.GetByCurrentUser(User).Result);
 
         [HttpPut("Update/{id}")]
-        public IActionResult Update(int id, [FromBody] OrderRequest order) => Ok(_service.Update(id, order).Result);
+        public IActionResult Update(long id, [FromBody] OrderRequest order) => Ok(_service.Update(id, order).Result);
 
         [HttpDelete("Delete/{id}")]
-        public IActionResult Delete(int id) => Ok(_service.Delete(id).Result);
+        public IActionResult Delete(long id) => Ok(_service.Delete(id).Result);
 
         //code=00&id=2e4acf1083304877bf1a8c108b30cccd&cancel=true&status=CANCELLED&orderCode=803347
         [HttpGet("return-url")]
